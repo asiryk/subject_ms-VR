@@ -1,8 +1,8 @@
 <script>
   import fragment from "./fragment.glsl";
   import vertex from "./vertex.glsl";
-  import { m4 } from "./Utils/m4.js";
-  import { TrackballRotator } from "./Utils/trackball-rotator.js";
+  import { TrackballRotator } from "../../../lib/trackball-rotator.js";
+  import { Matrix4, Vector3 } from "@math.gl/core";
 
   let gl; // The webgl context.
   let surface; // A surface model
@@ -65,20 +65,25 @@
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     /* Set the values of the projection transformation */
-    let projection = m4.perspective(Math.PI / 8, 1, 8, 12);
+    let projection = new Matrix4().perspective({
+      fovy: Math.PI / 8,
+      aspect: 1,
+      near: 8,
+      far: 12,
+    });
 
     /* Get the view matrix from the SimpleRotator object.*/
     let modelView = spaceball.getViewMatrix();
 
-    let rotateToPointZero = m4.axisRotation([0.707, 0.707, 0], 0.7);
-    let translateToPointZero = m4.translation(0, 0, -10);
+    let rotateToPointZero = new Matrix4().rotateAxis(0.7, [0.707, 0.707, 0]);
+    let translateToPointZero = new Matrix4().translate(new Vector3(0, 0, -10));
 
-    let matAccum0 = m4.multiply(rotateToPointZero, modelView);
-    let matAccum1 = m4.multiply(translateToPointZero, matAccum0);
+    let matAccum0 = rotateToPointZero.multiplyRight(modelView);
+    let matAccum1 = translateToPointZero.multiplyRight(matAccum0);
 
     /* Multiply the projection matrix times the modelview matrix to give the
        combined transformation matrix, and send that to the shader program. */
-    let modelViewProjection = m4.multiply(projection, matAccum1);
+    let modelViewProjection = projection.multiplyRight(matAccum1);
 
     gl.uniformMatrix4fv(
       shProgram.iModelViewProjectionMatrix,
@@ -180,6 +185,7 @@
       return;
     }
 
+    // @ts-ignore
     spaceball = new TrackballRotator(canvas, draw, 0);
 
     draw();

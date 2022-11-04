@@ -39,6 +39,7 @@
  *    Cannot be a multiple of viewpointDirection.  This is just the initial value for
  *    viewUp; it will be modified by rotation.
  */
+let touchStarted;
 export function TrackballRotator(
   canvas,
   callback,
