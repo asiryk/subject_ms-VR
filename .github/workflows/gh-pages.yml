@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v3
       
       - name: Setup Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: "16.x"
 
@@ -36,7 +36,7 @@ jobs:
         run: npm run build
         
       - name: Upload GitHub Pages artifact
-        uses: actions/upload-pages-artifact@v1.0.4
+        uses: actions/upload-pages-artifact@v1
         with:
           # Path of the directory containing the static assets.
           path: ./dist
@@ -52,7 +52,7 @@ jobs:
     needs: build
     steps:          
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v1.2.2
+        uses: actions/deploy-pages@v1
         id: deployment
         with:
           emit_telemetry: false
