@@ -34,9 +34,10 @@
  *
  * @module webgl-3d-math
  */
-export const m4 = (function(factory) {  // eslint-disable-line
+export const m4 = (function (factory) {
+  // eslint-disable-line
   return factory();
-}(function() {
+})(function () {
   "use strict";
 
   /**
@@ -56,7 +57,6 @@ export const m4 = (function(factory) {  // eslint-disable-line
    * @typedef {number[]|TypedArray} Matrix4
    * @memberOf module:webgl-3d-math
    */
-
 
   let MatType = Float32Array;
 
@@ -116,16 +116,16 @@ export const m4 = (function(factory) {  // eslint-disable-line
     var a31 = a[3 * 4 + 1];
     var a32 = a[3 * 4 + 2];
     var a33 = a[3 * 4 + 3];
-    dst[ 0] = b00 * a00 + b01 * a10 + b02 * a20 + b03 * a30;
-    dst[ 1] = b00 * a01 + b01 * a11 + b02 * a21 + b03 * a31;
-    dst[ 2] = b00 * a02 + b01 * a12 + b02 * a22 + b03 * a32;
-    dst[ 3] = b00 * a03 + b01 * a13 + b02 * a23 + b03 * a33;
-    dst[ 4] = b10 * a00 + b11 * a10 + b12 * a20 + b13 * a30;
-    dst[ 5] = b10 * a01 + b11 * a11 + b12 * a21 + b13 * a31;
-    dst[ 6] = b10 * a02 + b11 * a12 + b12 * a22 + b13 * a32;
-    dst[ 7] = b10 * a03 + b11 * a13 + b12 * a23 + b13 * a33;
-    dst[ 8] = b20 * a00 + b21 * a10 + b22 * a20 + b23 * a30;
-    dst[ 9] = b20 * a01 + b21 * a11 + b22 * a21 + b23 * a31;
+    dst[0] = b00 * a00 + b01 * a10 + b02 * a20 + b03 * a30;
+    dst[1] = b00 * a01 + b01 * a11 + b02 * a21 + b03 * a31;
+    dst[2] = b00 * a02 + b01 * a12 + b02 * a22 + b03 * a32;
+    dst[3] = b00 * a03 + b01 * a13 + b02 * a23 + b03 * a33;
+    dst[4] = b10 * a00 + b11 * a10 + b12 * a20 + b13 * a30;
+    dst[5] = b10 * a01 + b11 * a11 + b12 * a21 + b13 * a31;
+    dst[6] = b10 * a02 + b11 * a12 + b12 * a22 + b13 * a32;
+    dst[7] = b10 * a03 + b11 * a13 + b12 * a23 + b13 * a33;
+    dst[8] = b20 * a00 + b21 * a10 + b22 * a20 + b23 * a30;
+    dst[9] = b20 * a01 + b21 * a11 + b22 * a21 + b23 * a31;
     dst[10] = b20 * a02 + b21 * a12 + b22 * a22 + b23 * a32;
     dst[11] = b20 * a03 + b21 * a13 + b22 * a23 + b23 * a33;
     dst[12] = b30 * a00 + b31 * a10 + b32 * a20 + b33 * a30;
@@ -134,7 +134,6 @@ export const m4 = (function(factory) {  // eslint-disable-line
     dst[15] = b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33;
     return dst;
   }
-
 
   /**
    * adds 2 vectors3s
@@ -246,7 +245,7 @@ export const m4 = (function(factory) {  // eslint-disable-line
    * @memberOf module:webgl-3d-math
    */
   function dot(a, b) {
-    return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2]);
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
   }
 
   /**
@@ -281,16 +280,16 @@ export const m4 = (function(factory) {  // eslint-disable-line
   function identity(dst) {
     dst = dst || new MatType(16);
 
-    dst[ 0] = 1;
-    dst[ 1] = 0;
-    dst[ 2] = 0;
-    dst[ 3] = 0;
-    dst[ 4] = 0;
-    dst[ 5] = 1;
-    dst[ 6] = 0;
-    dst[ 7] = 0;
-    dst[ 8] = 0;
-    dst[ 9] = 0;
+    dst[0] = 1;
+    dst[1] = 0;
+    dst[2] = 0;
+    dst[3] = 0;
+    dst[4] = 0;
+    dst[5] = 1;
+    dst[6] = 0;
+    dst[7] = 0;
+    dst[8] = 0;
+    dst[9] = 0;
     dst[10] = 1;
     dst[11] = 0;
     dst[12] = 0;
@@ -311,16 +310,16 @@ export const m4 = (function(factory) {  // eslint-disable-line
   function transpose(m, dst) {
     dst = dst || new MatType(16);
 
-    dst[ 0] = m[0];
-    dst[ 1] = m[4];
-    dst[ 2] = m[8];
-    dst[ 3] = m[12];
-    dst[ 4] = m[1];
-    dst[ 5] = m[5];
-    dst[ 6] = m[9];
-    dst[ 7] = m[13];
-    dst[ 8] = m[2];
-    dst[ 9] = m[6];
+    dst[0] = m[0];
+    dst[1] = m[4];
+    dst[2] = m[8];
+    dst[3] = m[12];
+    dst[4] = m[1];
+    dst[5] = m[5];
+    dst[6] = m[9];
+    dst[7] = m[13];
+    dst[8] = m[2];
+    dst[9] = m[6];
     dst[10] = m[10];
     dst[11] = m[14];
     dst[12] = m[3];
@@ -345,21 +344,20 @@ export const m4 = (function(factory) {  // eslint-disable-line
    */
   function lookAt(cameraPosition, target, up, dst) {
     dst = dst || new MatType(16);
-    var zAxis = normalize(
-        subtractVectors(cameraPosition, target));
+    var zAxis = normalize(subtractVectors(cameraPosition, target));
     var xAxis = normalize(cross(up, zAxis));
     var yAxis = normalize(cross(zAxis, xAxis));
 
-    dst[ 0] = xAxis[0];
-    dst[ 1] = xAxis[1];
-    dst[ 2] = xAxis[2];
-    dst[ 3] = 0;
-    dst[ 4] = yAxis[0];
-    dst[ 5] = yAxis[1];
-    dst[ 6] = yAxis[2];
-    dst[ 7] = 0;
-    dst[ 8] = zAxis[0];
-    dst[ 9] = zAxis[1];
+    dst[0] = xAxis[0];
+    dst[1] = xAxis[1];
+    dst[2] = xAxis[2];
+    dst[3] = 0;
+    dst[4] = yAxis[0];
+    dst[5] = yAxis[1];
+    dst[6] = yAxis[2];
+    dst[7] = 0;
+    dst[8] = zAxis[0];
+    dst[9] = zAxis[1];
     dst[10] = zAxis[2];
     dst[11] = 0;
     dst[12] = cameraPosition[0];
@@ -394,16 +392,16 @@ export const m4 = (function(factory) {  // eslint-disable-line
     var f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewInRadians);
     var rangeInv = 1.0 / (near - far);
 
-    dst[ 0] = f / aspect;
-    dst[ 1] = 0;
-    dst[ 2] = 0;
-    dst[ 3] = 0;
-    dst[ 4] = 0;
-    dst[ 5] = f;
-    dst[ 6] = 0;
-    dst[ 7] = 0;
-    dst[ 8] = 0;
-    dst[ 9] = 0;
+    dst[0] = f / aspect;
+    dst[1] = 0;
+    dst[2] = 0;
+    dst[3] = 0;
+    dst[4] = 0;
+    dst[5] = f;
+    dst[6] = 0;
+    dst[7] = 0;
+    dst[8] = 0;
+    dst[9] = 0;
     dst[10] = (near + far) * rangeInv;
     dst[11] = -1;
     dst[12] = 0;
@@ -435,16 +433,16 @@ export const m4 = (function(factory) {  // eslint-disable-line
   function orthographic(left, right, bottom, top, near, far, dst) {
     dst = dst || new MatType(16);
 
-    dst[ 0] = 2 / (right - left);
-    dst[ 1] = 0;
-    dst[ 2] = 0;
-    dst[ 3] = 0;
-    dst[ 4] = 0;
-    dst[ 5] = 2 / (top - bottom);
-    dst[ 6] = 0;
-    dst[ 7] = 0;
-    dst[ 8] = 0;
-    dst[ 9] = 0;
+    dst[0] = 2 / (right - left);
+    dst[1] = 0;
+    dst[2] = 0;
+    dst[3] = 0;
+    dst[4] = 0;
+    dst[5] = 2 / (top - bottom);
+    dst[6] = 0;
+    dst[7] = 0;
+    dst[8] = 0;
+    dst[9] = 0;
     dst[10] = 2 / (near - far);
     dst[11] = 0;
     dst[12] = (left + right) / (left - right);
@@ -481,21 +479,21 @@ export const m4 = (function(factory) {  // eslint-disable-line
     var dy = top - bottom;
     var dz = far - near;
 
-    dst[ 0] = 2 * near / dx;
-    dst[ 1] = 0;
-    dst[ 2] = 0;
-    dst[ 3] = 0;
-    dst[ 4] = 0;
-    dst[ 5] = 2 * near / dy;
-    dst[ 6] = 0;
-    dst[ 7] = 0;
-    dst[ 8] = (left + right) / dx;
-    dst[ 9] = (top + bottom) / dy;
+    dst[0] = (2 * near) / dx;
+    dst[1] = 0;
+    dst[2] = 0;
+    dst[3] = 0;
+    dst[4] = 0;
+    dst[5] = (2 * near) / dy;
+    dst[6] = 0;
+    dst[7] = 0;
+    dst[8] = (left + right) / dx;
+    dst[9] = (top + bottom) / dy;
     dst[10] = -(far + near) / dz;
     dst[11] = -1;
     dst[12] = 0;
     dst[13] = 0;
-    dst[14] = -2 * near * far / dz;
+    dst[14] = (-2 * near * far) / dz;
     dst[15] = 0;
 
     return dst;
@@ -513,16 +511,16 @@ export const m4 = (function(factory) {  // eslint-disable-line
   function translation(tx, ty, tz, dst) {
     dst = dst || new MatType(16);
 
-    dst[ 0] = 1;
-    dst[ 1] = 0;
-    dst[ 2] = 0;
-    dst[ 3] = 0;
-    dst[ 4] = 0;
-    dst[ 5] = 1;
-    dst[ 6] = 0;
-    dst[ 7] = 0;
-    dst[ 8] = 0;
-    dst[ 9] = 0;
+    dst[0] = 1;
+    dst[1] = 0;
+    dst[2] = 0;
+    dst[3] = 0;
+    dst[4] = 0;
+    dst[5] = 1;
+    dst[6] = 0;
+    dst[7] = 0;
+    dst[8] = 0;
+    dst[9] = 0;
     dst[10] = 1;
     dst[11] = 0;
     dst[12] = tx;
@@ -566,16 +564,16 @@ export const m4 = (function(factory) {  // eslint-disable-line
     var m33 = m[3 * 4 + 3];
 
     if (m !== dst) {
-      dst[ 0] = m00;
-      dst[ 1] = m01;
-      dst[ 2] = m02;
-      dst[ 3] = m03;
-      dst[ 4] = m10;
-      dst[ 5] = m11;
-      dst[ 6] = m12;
-      dst[ 7] = m13;
-      dst[ 8] = m20;
-      dst[ 9] = m21;
+      dst[0] = m00;
+      dst[1] = m01;
+      dst[2] = m02;
+      dst[3] = m03;
+      dst[4] = m10;
+      dst[5] = m11;
+      dst[6] = m12;
+      dst[7] = m13;
+      dst[8] = m20;
+      dst[9] = m21;
       dst[10] = m22;
       dst[11] = m23;
     }
@@ -600,16 +598,16 @@ export const m4 = (function(factory) {  // eslint-disable-line
     var c = Math.cos(angleInRadians);
     var s = Math.sin(angleInRadians);
 
-    dst[ 0] = 1;
-    dst[ 1] = 0;
-    dst[ 2] = 0;
-    dst[ 3] = 0;
-    dst[ 4] = 0;
-    dst[ 5] = c;
-    dst[ 6] = s;
-    dst[ 7] = 0;
-    dst[ 8] = 0;
-    dst[ 9] = -s;
+    dst[0] = 1;
+    dst[1] = 0;
+    dst[2] = 0;
+    dst[3] = 0;
+    dst[4] = 0;
+    dst[5] = c;
+    dst[6] = s;
+    dst[7] = 0;
+    dst[8] = 0;
+    dst[9] = -s;
     dst[10] = c;
     dst[11] = 0;
     dst[12] = 0;
@@ -644,20 +642,20 @@ export const m4 = (function(factory) {  // eslint-disable-line
     var c = Math.cos(angleInRadians);
     var s = Math.sin(angleInRadians);
 
-    dst[4]  = c * m10 + s * m20;
-    dst[5]  = c * m11 + s * m21;
-    dst[6]  = c * m12 + s * m22;
-    dst[7]  = c * m13 + s * m23;
-    dst[8]  = c * m20 - s * m10;
-    dst[9]  = c * m21 - s * m11;
+    dst[4] = c * m10 + s * m20;
+    dst[5] = c * m11 + s * m21;
+    dst[6] = c * m12 + s * m22;
+    dst[7] = c * m13 + s * m23;
+    dst[8] = c * m20 - s * m10;
+    dst[9] = c * m21 - s * m11;
     dst[10] = c * m22 - s * m12;
     dst[11] = c * m23 - s * m13;
 
     if (m !== dst) {
-      dst[ 0] = m[ 0];
-      dst[ 1] = m[ 1];
-      dst[ 2] = m[ 2];
-      dst[ 3] = m[ 3];
+      dst[0] = m[0];
+      dst[1] = m[1];
+      dst[2] = m[2];
+      dst[3] = m[3];
       dst[12] = m[12];
       dst[13] = m[13];
       dst[14] = m[14];
@@ -679,16 +677,16 @@ export const m4 = (function(factory) {  // eslint-disable-line
     var c = Math.cos(angleInRadians);
     var s = Math.sin(angleInRadians);
 
-    dst[ 0] = c;
-    dst[ 1] = 0;
-    dst[ 2] = -s;
-    dst[ 3] = 0;
-    dst[ 4] = 0;
-    dst[ 5] = 1;
-    dst[ 6] = 0;
-    dst[ 7] = 0;
-    dst[ 8] = s;
-    dst[ 9] = 0;
+    dst[0] = c;
+    dst[1] = 0;
+    dst[2] = -s;
+    dst[3] = 0;
+    dst[4] = 0;
+    dst[5] = 1;
+    dst[6] = 0;
+    dst[7] = 0;
+    dst[8] = s;
+    dst[9] = 0;
     dst[10] = c;
     dst[11] = 0;
     dst[12] = 0;
@@ -723,20 +721,20 @@ export const m4 = (function(factory) {  // eslint-disable-line
     var c = Math.cos(angleInRadians);
     var s = Math.sin(angleInRadians);
 
-    dst[ 0] = c * m00 - s * m20;
-    dst[ 1] = c * m01 - s * m21;
-    dst[ 2] = c * m02 - s * m22;
-    dst[ 3] = c * m03 - s * m23;
-    dst[ 8] = c * m20 + s * m00;
-    dst[ 9] = c * m21 + s * m01;
+    dst[0] = c * m00 - s * m20;
+    dst[1] = c * m01 - s * m21;
+    dst[2] = c * m02 - s * m22;
+    dst[3] = c * m03 - s * m23;
+    dst[8] = c * m20 + s * m00;
+    dst[9] = c * m21 + s * m01;
     dst[10] = c * m22 + s * m02;
     dst[11] = c * m23 + s * m03;
 
     if (m !== dst) {
-      dst[ 4] = m[ 4];
-      dst[ 5] = m[ 5];
-      dst[ 6] = m[ 6];
-      dst[ 7] = m[ 7];
+      dst[4] = m[4];
+      dst[5] = m[5];
+      dst[6] = m[6];
+      dst[7] = m[7];
       dst[12] = m[12];
       dst[13] = m[13];
       dst[14] = m[14];
@@ -758,16 +756,16 @@ export const m4 = (function(factory) {  // eslint-disable-line
     var c = Math.cos(angleInRadians);
     var s = Math.sin(angleInRadians);
 
-    dst[ 0] = c;
-    dst[ 1] = s;
-    dst[ 2] = 0;
-    dst[ 3] = 0;
-    dst[ 4] = -s;
-    dst[ 5] = c;
-    dst[ 6] = 0;
-    dst[ 7] = 0;
-    dst[ 8] = 0;
-    dst[ 9] = 0;
+    dst[0] = c;
+    dst[1] = s;
+    dst[2] = 0;
+    dst[3] = 0;
+    dst[4] = -s;
+    dst[5] = c;
+    dst[6] = 0;
+    dst[7] = 0;
+    dst[8] = 0;
+    dst[9] = 0;
     dst[10] = 1;
     dst[11] = 0;
     dst[12] = 0;
@@ -802,18 +800,18 @@ export const m4 = (function(factory) {  // eslint-disable-line
     var c = Math.cos(angleInRadians);
     var s = Math.sin(angleInRadians);
 
-    dst[ 0] = c * m00 + s * m10;
-    dst[ 1] = c * m01 + s * m11;
-    dst[ 2] = c * m02 + s * m12;
-    dst[ 3] = c * m03 + s * m13;
-    dst[ 4] = c * m10 - s * m00;
-    dst[ 5] = c * m11 - s * m01;
-    dst[ 6] = c * m12 - s * m02;
-    dst[ 7] = c * m13 - s * m03;
+    dst[0] = c * m00 + s * m10;
+    dst[1] = c * m01 + s * m11;
+    dst[2] = c * m02 + s * m12;
+    dst[3] = c * m03 + s * m13;
+    dst[4] = c * m10 - s * m00;
+    dst[5] = c * m11 - s * m01;
+    dst[6] = c * m12 - s * m02;
+    dst[7] = c * m13 - s * m03;
 
     if (m !== dst) {
-      dst[ 8] = m[ 8];
-      dst[ 9] = m[ 9];
+      dst[8] = m[8];
+      dst[9] = m[9];
       dst[10] = m[10];
       dst[11] = m[11];
       dst[12] = m[12];
@@ -850,16 +848,16 @@ export const m4 = (function(factory) {  // eslint-disable-line
     var s = Math.sin(angleInRadians);
     var oneMinusCosine = 1 - c;
 
-    dst[ 0] = xx + (1 - xx) * c;
-    dst[ 1] = x * y * oneMinusCosine + z * s;
-    dst[ 2] = x * z * oneMinusCosine - y * s;
-    dst[ 3] = 0;
-    dst[ 4] = x * y * oneMinusCosine - z * s;
-    dst[ 5] = yy + (1 - yy) * c;
-    dst[ 6] = y * z * oneMinusCosine + x * s;
-    dst[ 7] = 0;
-    dst[ 8] = x * z * oneMinusCosine + y * s;
-    dst[ 9] = y * z * oneMinusCosine - x * s;
+    dst[0] = xx + (1 - xx) * c;
+    dst[1] = x * y * oneMinusCosine + z * s;
+    dst[2] = x * z * oneMinusCosine - y * s;
+    dst[3] = 0;
+    dst[4] = x * y * oneMinusCosine - z * s;
+    dst[5] = yy + (1 - yy) * c;
+    dst[6] = y * z * oneMinusCosine + x * s;
+    dst[7] = 0;
+    dst[8] = x * z * oneMinusCosine + y * s;
+    dst[9] = y * z * oneMinusCosine - x * s;
     dst[10] = zz + (1 - zz) * c;
     dst[11] = 0;
     dst[12] = 0;
@@ -921,16 +919,16 @@ export const m4 = (function(factory) {  // eslint-disable-line
     var m22 = m[10];
     var m23 = m[11];
 
-    dst[ 0] = r00 * m00 + r01 * m10 + r02 * m20;
-    dst[ 1] = r00 * m01 + r01 * m11 + r02 * m21;
-    dst[ 2] = r00 * m02 + r01 * m12 + r02 * m22;
-    dst[ 3] = r00 * m03 + r01 * m13 + r02 * m23;
-    dst[ 4] = r10 * m00 + r11 * m10 + r12 * m20;
-    dst[ 5] = r10 * m01 + r11 * m11 + r12 * m21;
-    dst[ 6] = r10 * m02 + r11 * m12 + r12 * m22;
-    dst[ 7] = r10 * m03 + r11 * m13 + r12 * m23;
-    dst[ 8] = r20 * m00 + r21 * m10 + r22 * m20;
-    dst[ 9] = r20 * m01 + r21 * m11 + r22 * m21;
+    dst[0] = r00 * m00 + r01 * m10 + r02 * m20;
+    dst[1] = r00 * m01 + r01 * m11 + r02 * m21;
+    dst[2] = r00 * m02 + r01 * m12 + r02 * m22;
+    dst[3] = r00 * m03 + r01 * m13 + r02 * m23;
+    dst[4] = r10 * m00 + r11 * m10 + r12 * m20;
+    dst[5] = r10 * m01 + r11 * m11 + r12 * m21;
+    dst[6] = r10 * m02 + r11 * m12 + r12 * m22;
+    dst[7] = r10 * m03 + r11 * m13 + r12 * m23;
+    dst[8] = r20 * m00 + r21 * m10 + r22 * m20;
+    dst[9] = r20 * m01 + r21 * m11 + r22 * m21;
     dst[10] = r20 * m02 + r21 * m12 + r22 * m22;
     dst[11] = r20 * m03 + r21 * m13 + r22 * m23;
 
@@ -956,16 +954,16 @@ export const m4 = (function(factory) {  // eslint-disable-line
   function scaling(sx, sy, sz, dst) {
     dst = dst || new MatType(16);
 
-    dst[ 0] = sx;
-    dst[ 1] = 0;
-    dst[ 2] = 0;
-    dst[ 3] = 0;
-    dst[ 4] = 0;
-    dst[ 5] = sy;
-    dst[ 6] = 0;
-    dst[ 7] = 0;
-    dst[ 8] = 0;
-    dst[ 9] = 0;
+    dst[0] = sx;
+    dst[1] = 0;
+    dst[2] = 0;
+    dst[3] = 0;
+    dst[4] = 0;
+    dst[5] = sy;
+    dst[6] = 0;
+    dst[7] = 0;
+    dst[8] = 0;
+    dst[9] = 0;
     dst[10] = sz;
     dst[11] = 0;
     dst[12] = 0;
@@ -991,16 +989,16 @@ export const m4 = (function(factory) {  // eslint-disable-line
     // return multiply(m, scaling(sx, sy, sz), dst);
     dst = dst || new MatType(16);
 
-    dst[ 0] = sx * m[0 * 4 + 0];
-    dst[ 1] = sx * m[0 * 4 + 1];
-    dst[ 2] = sx * m[0 * 4 + 2];
-    dst[ 3] = sx * m[0 * 4 + 3];
-    dst[ 4] = sy * m[1 * 4 + 0];
-    dst[ 5] = sy * m[1 * 4 + 1];
-    dst[ 6] = sy * m[1 * 4 + 2];
-    dst[ 7] = sy * m[1 * 4 + 3];
-    dst[ 8] = sz * m[2 * 4 + 0];
-    dst[ 9] = sz * m[2 * 4 + 1];
+    dst[0] = sx * m[0 * 4 + 0];
+    dst[1] = sx * m[0 * 4 + 1];
+    dst[2] = sx * m[0 * 4 + 2];
+    dst[3] = sx * m[0 * 4 + 3];
+    dst[4] = sy * m[1 * 4 + 0];
+    dst[5] = sy * m[1 * 4 + 1];
+    dst[6] = sy * m[1 * 4 + 2];
+    dst[7] = sy * m[1 * 4 + 3];
+    dst[8] = sz * m[2 * 4 + 0];
+    dst[9] = sz * m[2 * 4 + 1];
     dst[10] = sz * m[2 * 4 + 2];
     dst[11] = sz * m[2 * 4 + 3];
 
@@ -1060,8 +1058,8 @@ export const m4 = (function(factory) {  // eslint-disable-line
     dst[6] = (yz + wx) * sy;
     dst[7] = 0;
 
-    dst[ 8] = (xz + wy) * sz;
-    dst[ 9] = (yz - wx) * sz;
+    dst[8] = (xz + wy) * sz;
+    dst[9] = (yz - wx) * sz;
     dst[10] = (1 - (xx + yy)) * sz;
     dst[11] = 0;
 
@@ -1174,27 +1172,39 @@ export const m4 = (function(factory) {  // eslint-disable-line
     var m31 = m[3 * 4 + 1];
     var m32 = m[3 * 4 + 2];
     var m33 = m[3 * 4 + 3];
-    var tmp_0  = m22 * m33;
-    var tmp_1  = m32 * m23;
-    var tmp_2  = m12 * m33;
-    var tmp_3  = m32 * m13;
-    var tmp_4  = m12 * m23;
-    var tmp_5  = m22 * m13;
-    var tmp_6  = m02 * m33;
-    var tmp_7  = m32 * m03;
-    var tmp_8  = m02 * m23;
-    var tmp_9  = m22 * m03;
+    var tmp_0 = m22 * m33;
+    var tmp_1 = m32 * m23;
+    var tmp_2 = m12 * m33;
+    var tmp_3 = m32 * m13;
+    var tmp_4 = m12 * m23;
+    var tmp_5 = m22 * m13;
+    var tmp_6 = m02 * m33;
+    var tmp_7 = m32 * m03;
+    var tmp_8 = m02 * m23;
+    var tmp_9 = m22 * m03;
     var tmp_10 = m02 * m13;
     var tmp_11 = m12 * m03;
 
-    var t0 = (tmp_0 * m11 + tmp_3 * m21 + tmp_4 * m31) -
-        (tmp_1 * m11 + tmp_2 * m21 + tmp_5 * m31);
-    var t1 = (tmp_1 * m01 + tmp_6 * m21 + tmp_9 * m31) -
-        (tmp_0 * m01 + tmp_7 * m21 + tmp_8 * m31);
-    var t2 = (tmp_2 * m01 + tmp_7 * m11 + tmp_10 * m31) -
-        (tmp_3 * m01 + tmp_6 * m11 + tmp_11 * m31);
-    var t3 = (tmp_5 * m01 + tmp_8 * m11 + tmp_11 * m21) -
-        (tmp_4 * m01 + tmp_9 * m11 + tmp_10 * m21);
+    var t0 =
+      tmp_0 * m11 +
+      tmp_3 * m21 +
+      tmp_4 * m31 -
+      (tmp_1 * m11 + tmp_2 * m21 + tmp_5 * m31);
+    var t1 =
+      tmp_1 * m01 +
+      tmp_6 * m21 +
+      tmp_9 * m31 -
+      (tmp_0 * m01 + tmp_7 * m21 + tmp_8 * m31);
+    var t2 =
+      tmp_2 * m01 +
+      tmp_7 * m11 +
+      tmp_10 * m31 -
+      (tmp_3 * m01 + tmp_6 * m11 + tmp_11 * m31);
+    var t3 =
+      tmp_5 * m01 +
+      tmp_8 * m11 +
+      tmp_11 * m21 -
+      (tmp_4 * m01 + tmp_9 * m11 + tmp_10 * m21);
 
     return 1.0 / (m00 * t0 + m10 * t1 + m20 * t2 + m30 * t3);
   }
@@ -1224,16 +1234,16 @@ export const m4 = (function(factory) {  // eslint-disable-line
     var m31 = m[3 * 4 + 1];
     var m32 = m[3 * 4 + 2];
     var m33 = m[3 * 4 + 3];
-    var tmp_0  = m22 * m33;
-    var tmp_1  = m32 * m23;
-    var tmp_2  = m12 * m33;
-    var tmp_3  = m32 * m13;
-    var tmp_4  = m12 * m23;
-    var tmp_5  = m22 * m13;
-    var tmp_6  = m02 * m33;
-    var tmp_7  = m32 * m03;
-    var tmp_8  = m02 * m23;
-    var tmp_9  = m22 * m03;
+    var tmp_0 = m22 * m33;
+    var tmp_1 = m32 * m23;
+    var tmp_2 = m12 * m33;
+    var tmp_3 = m32 * m13;
+    var tmp_4 = m12 * m23;
+    var tmp_5 = m22 * m13;
+    var tmp_6 = m02 * m33;
+    var tmp_7 = m32 * m03;
+    var tmp_8 = m02 * m23;
+    var tmp_9 = m22 * m03;
     var tmp_10 = m02 * m13;
     var tmp_11 = m12 * m03;
     var tmp_12 = m20 * m31;
@@ -1249,14 +1259,26 @@ export const m4 = (function(factory) {  // eslint-disable-line
     var tmp_22 = m00 * m11;
     var tmp_23 = m10 * m01;
 
-    var t0 = (tmp_0 * m11 + tmp_3 * m21 + tmp_4 * m31) -
-        (tmp_1 * m11 + tmp_2 * m21 + tmp_5 * m31);
-    var t1 = (tmp_1 * m01 + tmp_6 * m21 + tmp_9 * m31) -
-        (tmp_0 * m01 + tmp_7 * m21 + tmp_8 * m31);
-    var t2 = (tmp_2 * m01 + tmp_7 * m11 + tmp_10 * m31) -
-        (tmp_3 * m01 + tmp_6 * m11 + tmp_11 * m31);
-    var t3 = (tmp_5 * m01 + tmp_8 * m11 + tmp_11 * m21) -
-        (tmp_4 * m01 + tmp_9 * m11 + tmp_10 * m21);
+    var t0 =
+      tmp_0 * m11 +
+      tmp_3 * m21 +
+      tmp_4 * m31 -
+      (tmp_1 * m11 + tmp_2 * m21 + tmp_5 * m31);
+    var t1 =
+      tmp_1 * m01 +
+      tmp_6 * m21 +
+      tmp_9 * m31 -
+      (tmp_0 * m01 + tmp_7 * m21 + tmp_8 * m31);
+    var t2 =
+      tmp_2 * m01 +
+      tmp_7 * m11 +
+      tmp_10 * m31 -
+      (tmp_3 * m01 + tmp_6 * m11 + tmp_11 * m31);
+    var t3 =
+      tmp_5 * m01 +
+      tmp_8 * m11 +
+      tmp_11 * m21 -
+      (tmp_4 * m01 + tmp_9 * m11 + tmp_10 * m21);
 
     var d = 1.0 / (m00 * t0 + m10 * t1 + m20 * t2 + m30 * t3);
 
@@ -1264,30 +1286,78 @@ export const m4 = (function(factory) {  // eslint-disable-line
     dst[1] = d * t1;
     dst[2] = d * t2;
     dst[3] = d * t3;
-    dst[4] = d * ((tmp_1 * m10 + tmp_2 * m20 + tmp_5 * m30) -
-          (tmp_0 * m10 + tmp_3 * m20 + tmp_4 * m30));
-    dst[5] = d * ((tmp_0 * m00 + tmp_7 * m20 + tmp_8 * m30) -
-          (tmp_1 * m00 + tmp_6 * m20 + tmp_9 * m30));
-    dst[6] = d * ((tmp_3 * m00 + tmp_6 * m10 + tmp_11 * m30) -
-          (tmp_2 * m00 + tmp_7 * m10 + tmp_10 * m30));
-    dst[7] = d * ((tmp_4 * m00 + tmp_9 * m10 + tmp_10 * m20) -
-          (tmp_5 * m00 + tmp_8 * m10 + tmp_11 * m20));
-    dst[8] = d * ((tmp_12 * m13 + tmp_15 * m23 + tmp_16 * m33) -
-          (tmp_13 * m13 + tmp_14 * m23 + tmp_17 * m33));
-    dst[9] = d * ((tmp_13 * m03 + tmp_18 * m23 + tmp_21 * m33) -
-          (tmp_12 * m03 + tmp_19 * m23 + tmp_20 * m33));
-    dst[10] = d * ((tmp_14 * m03 + tmp_19 * m13 + tmp_22 * m33) -
-          (tmp_15 * m03 + tmp_18 * m13 + tmp_23 * m33));
-    dst[11] = d * ((tmp_17 * m03 + tmp_20 * m13 + tmp_23 * m23) -
-          (tmp_16 * m03 + tmp_21 * m13 + tmp_22 * m23));
-    dst[12] = d * ((tmp_14 * m22 + tmp_17 * m32 + tmp_13 * m12) -
-          (tmp_16 * m32 + tmp_12 * m12 + tmp_15 * m22));
-    dst[13] = d * ((tmp_20 * m32 + tmp_12 * m02 + tmp_19 * m22) -
-          (tmp_18 * m22 + tmp_21 * m32 + tmp_13 * m02));
-    dst[14] = d * ((tmp_18 * m12 + tmp_23 * m32 + tmp_15 * m02) -
-          (tmp_22 * m32 + tmp_14 * m02 + tmp_19 * m12));
-    dst[15] = d * ((tmp_22 * m22 + tmp_16 * m02 + tmp_21 * m12) -
-          (tmp_20 * m12 + tmp_23 * m22 + tmp_17 * m02));
+    dst[4] =
+      d *
+      (tmp_1 * m10 +
+        tmp_2 * m20 +
+        tmp_5 * m30 -
+        (tmp_0 * m10 + tmp_3 * m20 + tmp_4 * m30));
+    dst[5] =
+      d *
+      (tmp_0 * m00 +
+        tmp_7 * m20 +
+        tmp_8 * m30 -
+        (tmp_1 * m00 + tmp_6 * m20 + tmp_9 * m30));
+    dst[6] =
+      d *
+      (tmp_3 * m00 +
+        tmp_6 * m10 +
+        tmp_11 * m30 -
+        (tmp_2 * m00 + tmp_7 * m10 + tmp_10 * m30));
+    dst[7] =
+      d *
+      (tmp_4 * m00 +
+        tmp_9 * m10 +
+        tmp_10 * m20 -
+        (tmp_5 * m00 + tmp_8 * m10 + tmp_11 * m20));
+    dst[8] =
+      d *
+      (tmp_12 * m13 +
+        tmp_15 * m23 +
+        tmp_16 * m33 -
+        (tmp_13 * m13 + tmp_14 * m23 + tmp_17 * m33));
+    dst[9] =
+      d *
+      (tmp_13 * m03 +
+        tmp_18 * m23 +
+        tmp_21 * m33 -
+        (tmp_12 * m03 + tmp_19 * m23 + tmp_20 * m33));
+    dst[10] =
+      d *
+      (tmp_14 * m03 +
+        tmp_19 * m13 +
+        tmp_22 * m33 -
+        (tmp_15 * m03 + tmp_18 * m13 + tmp_23 * m33));
+    dst[11] =
+      d *
+      (tmp_17 * m03 +
+        tmp_20 * m13 +
+        tmp_23 * m23 -
+        (tmp_16 * m03 + tmp_21 * m13 + tmp_22 * m23));
+    dst[12] =
+      d *
+      (tmp_14 * m22 +
+        tmp_17 * m32 +
+        tmp_13 * m12 -
+        (tmp_16 * m32 + tmp_12 * m12 + tmp_15 * m22));
+    dst[13] =
+      d *
+      (tmp_20 * m32 +
+        tmp_12 * m02 +
+        tmp_19 * m22 -
+        (tmp_18 * m22 + tmp_21 * m32 + tmp_13 * m02));
+    dst[14] =
+      d *
+      (tmp_18 * m12 +
+        tmp_23 * m32 +
+        tmp_15 * m02 -
+        (tmp_22 * m32 + tmp_14 * m02 + tmp_19 * m12));
+    dst[15] =
+      d *
+      (tmp_22 * m22 +
+        tmp_16 * m02 +
+        tmp_21 * m12 -
+        (tmp_20 * m12 + tmp_23 * m22 + tmp_17 * m02));
 
     return dst;
   }
@@ -1327,11 +1397,27 @@ export const m4 = (function(factory) {  // eslint-disable-line
     var v0 = v[0];
     var v1 = v[1];
     var v2 = v[2];
-    var d = v0 * m[0 * 4 + 3] + v1 * m[1 * 4 + 3] + v2 * m[2 * 4 + 3] + m[3 * 4 + 3];
+    var d =
+      v0 * m[0 * 4 + 3] + v1 * m[1 * 4 + 3] + v2 * m[2 * 4 + 3] + m[3 * 4 + 3];
 
-    dst[0] = (v0 * m[0 * 4 + 0] + v1 * m[1 * 4 + 0] + v2 * m[2 * 4 + 0] + m[3 * 4 + 0]) / d;
-    dst[1] = (v0 * m[0 * 4 + 1] + v1 * m[1 * 4 + 1] + v2 * m[2 * 4 + 1] + m[3 * 4 + 1]) / d;
-    dst[2] = (v0 * m[0 * 4 + 2] + v1 * m[1 * 4 + 2] + v2 * m[2 * 4 + 2] + m[3 * 4 + 2]) / d;
+    dst[0] =
+      (v0 * m[0 * 4 + 0] +
+        v1 * m[1 * 4 + 0] +
+        v2 * m[2 * 4 + 0] +
+        m[3 * 4 + 0]) /
+      d;
+    dst[1] =
+      (v0 * m[0 * 4 + 1] +
+        v1 * m[1 * 4 + 1] +
+        v2 * m[2 * 4 + 1] +
+        m[3 * 4 + 1]) /
+      d;
+    dst[2] =
+      (v0 * m[0 * 4 + 2] +
+        v1 * m[1 * 4 + 2] +
+        v2 * m[2 * 4 + 2] +
+        m[3 * 4 + 2]) /
+      d;
 
     return dst;
   }
@@ -1395,16 +1481,16 @@ export const m4 = (function(factory) {  // eslint-disable-line
   function copy(src, dst) {
     dst = dst || new MatType(16);
 
-    dst[ 0] = src[ 0];
-    dst[ 1] = src[ 1];
-    dst[ 2] = src[ 2];
-    dst[ 3] = src[ 3];
-    dst[ 4] = src[ 4];
-    dst[ 5] = src[ 5];
-    dst[ 6] = src[ 6];
-    dst[ 7] = src[ 7];
-    dst[ 8] = src[ 8];
-    dst[ 9] = src[ 9];
+    dst[0] = src[0];
+    dst[1] = src[1];
+    dst[2] = src[2];
+    dst[3] = src[3];
+    dst[4] = src[4];
+    dst[5] = src[5];
+    dst[6] = src[6];
+    dst[7] = src[7];
+    dst[8] = src[8];
+    dst[9] = src[9];
     dst[10] = src[10];
     dst[11] = src[11];
     dst[12] = src[12];
@@ -1455,7 +1541,4 @@ export const m4 = (function(factory) {  // eslint-disable-line
     transformNormal: transformNormal,
     setDefaultType: setDefaultType,
   };
-
-}));
-
-
+});
