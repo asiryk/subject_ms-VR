@@ -63,6 +63,9 @@ export function TrackballRotator(
     normalize(unity, unity);
     cross(unitx, unity, unitz);
   };
+  this.setCallback = function (cb) {
+    callback = cb;
+  };
   this.getViewMatrix = function () {
     var mat = [
       unitx[0],
