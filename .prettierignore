@@ -1,0 +1,25 @@
+# Ignore artifacts:
+META-INF/
+target/
+reports/
+outputs/
+**/coverage
+node_modules/
+.github/actions/
+.husky
+.vs/
+.vscode/
+.settings/
+.gitattributes
+.gitignore
+.npmrc
+.DS_Store
+**/dist
+logs/
+docs/
+
+README.md
+
+# IntelliJ related files
+.idea/**/*.*
+*.iml

@@ -1,4 +1,4 @@
-import { NumericArray, Matrix4, Vector4 } from "@math.gl/core";
+import { NumericArray, Matrix4, Vector4, Vector3 } from "@math.gl/core";
 
 export class Program<A extends string, U extends string> {
   private readonly gl: WebGLRenderingContext;
@@ -37,8 +37,8 @@ export class Program<A extends string, U extends string> {
     );
   }
 
-  public getWebGLProgram(): WebGLProgram {
-    return this.program;
+  public use(useProgram: (prog: WebGLProgram) => void): void {
+    useProgram(this.program);
   }
 
   public setUniform(uniform: U, cpuMem: NumericArray): void {
@@ -47,6 +47,10 @@ export class Program<A extends string, U extends string> {
       this.gl.uniformMatrix4fv(gpuMem, false, cpuMem);
     } else if (cpuMem instanceof Vector4) {
       this.gl.uniform4fv(gpuMem, cpuMem);
+    } else if (cpuMem instanceof Vector3) {
+      this.gl.uniform3fv(gpuMem, cpuMem);
+    } else {
+      throw new Error("Unsupported type");
     }
   }
 
