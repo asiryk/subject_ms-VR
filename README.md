@@ -1,8 +1,7 @@
 # Visualization of graphical and geometric information
 
-> Website https://vggi-kpi.blogspot.com/
-
-[Assignments webpage](https://asiryk.github.io/subject_ms-VGGI/)
+> Website https://vggi-kpi.blogspot.com/  
+> Assignments website https://asiryk.github.io/subject_ms-VGGI/
 
 ## Practical assignment 1
 
