@@ -1,4 +1,4 @@
-import { NumericArray, Matrix4, Vector4, Vector3 } from "@math.gl/core";
+import { NumericArray, Matrix4, Vector4, Vector3, Vector2 } from "@math.gl/core";
 
 export class Program<A extends string, U extends string> {
   private readonly gl: WebGLRenderingContext;
@@ -41,7 +41,7 @@ export class Program<A extends string, U extends string> {
     useProgram(this.program);
   }
 
-  public setUniform(uniform: U, cpuMem: NumericArray): void {
+  public setUniform(uniform: U, cpuMem: NumericArray | number): void {
     const gpuMem = this.uniforms.get(uniform);
     if (cpuMem instanceof Matrix4) {
       this.gl.uniformMatrix4fv(gpuMem, false, cpuMem);
@@ -49,7 +49,11 @@ export class Program<A extends string, U extends string> {
       this.gl.uniform4fv(gpuMem, cpuMem);
     } else if (cpuMem instanceof Vector3) {
       this.gl.uniform3fv(gpuMem, cpuMem);
-    } else {
+    } else if (cpuMem instanceof Vector2) {
+      this.gl.uniform2fv(gpuMem, cpuMem);
+    } else if (typeof cpuMem === "number") {
+      this.gl.uniform1f(gpuMem, cpuMem);
+    }else {
       throw new Error("Unsupported type");
     }
   }
@@ -64,6 +68,14 @@ export class Program<A extends string, U extends string> {
     this.gl.bufferData(this.gl.ARRAY_BUFFER, cpuMemBuf, this.gl.STREAM_DRAW);
     this.gl.enableVertexAttribArray(gpuMem);
     this.gl.vertexAttribPointer(gpuMem, size, type, false, 0, 0);
+  }
+
+  public setTexture(image: HTMLImageElement): void {
+    const texture = this.gl.createTexture();
+    this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+    this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, image);
   }
 
   private createShader(type: GLenum, source: string): WebGLShader {
