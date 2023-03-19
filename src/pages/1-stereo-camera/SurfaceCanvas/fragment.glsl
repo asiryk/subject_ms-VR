@@ -13,8 +13,8 @@ uniform vec3 light_position;
 uniform sampler2D u_texture;
 
 vec3 calculate_light(vec3 position) {
-  vec3 shape_color = vec3(0.21176470588235, 0.054901960784313, 0.12156862745098);
-  vec3 light_color = vec3(1., 0.788235294117647, 0.5803921568627451);
+  vec3 shape_color = vec3(0.7, 0.7, 0.7);
+  vec3 light_color = vec3(1., 1., 1.);
 
   // ambient component
   vec3 ambient = light_color * 0.2;
