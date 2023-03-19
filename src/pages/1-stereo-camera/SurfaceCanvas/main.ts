@@ -66,8 +66,20 @@ function draw(
 ) {
   program.use(gl.useProgram.bind(gl));
   gl.clearColor(0, 0, 0, 1);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // removes black bg
+  // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // removes black bg
 
+  drawLeft(gl, program, surface, rotator);
+  drawRight(gl, program, surface, rotator);
+
+}
+
+// draw shape for left eye
+function drawLeft(
+  gl: WebGLRenderingContext,
+  program: Program<Attributes, Uniforms>,
+  surface: Vector3[],
+  rotator: TrackballRotator
+) {
   const projection = new Matrix4().ortho({
     left: 1,
     right: -1,
@@ -77,8 +89,42 @@ function draw(
 
   const rotatorView = rotator.getViewMatrix();
   const rotateToPointZero = new Matrix4().rotateAxis(
-    0.7,
-    new Vector3(0, 0, 0) // POV from top
+    1.5,
+    new Vector3(1, 1, -1)
+  );
+  const translateToPointZero = new Matrix4().translate(new Vector3(0, 0, -10));
+  const matAccum0 = rotateToPointZero.multiplyRight(rotatorView);
+  const modelView = translateToPointZero.multiplyRight(matAccum0);
+
+  // create normal matrix from modelView matrix
+  const normalMatrix = new Matrix4().copy(modelView).invert().transpose();
+
+  program.setUniform(Uniforms.ModelViewMatrix, modelView);
+  program.setUniform(Uniforms.ProjectionMatrix, projection);
+  program.setUniform(Uniforms.NormalMatrix, normalMatrix);
+
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, surface.length);
+
+}
+
+// draw shape for right eye
+function drawRight(
+  gl: WebGLRenderingContext,
+  program: Program<Attributes, Uniforms>,
+  surface: Vector3[],
+  rotator: TrackballRotator
+) {
+  const projection = new Matrix4().ortho({
+    left: 1,
+    right: -1,
+    bottom: 1,
+    top: -1,
+  });
+
+  const rotatorView = rotator.getViewMatrix();
+  const rotateToPointZero = new Matrix4().rotateAxis(
+    1.5,
+    new Vector3(1, 1, -1)
   );
   const translateToPointZero = new Matrix4().translate(new Vector3(0, 0, -10));
   const matAccum0 = rotateToPointZero.multiplyRight(rotatorView);
@@ -94,19 +140,14 @@ function draw(
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, surface.length);
 }
 
+
 function initTweakpane() {
-  const container = document.createElement("div");
-  document.body.appendChild(container);
-  container.style.position = "absolute";
-  container.style.top = "8px";
-  container.style.left = "8px";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pane = new Pane({ container }) as any;
+  const pane = new Pane() as any;
 
   const PARAMS = {
     light: { x: 0, y: 0, z: 0 },
     texScale: { x: 0, y: 0 },
-    texPivot: { x: 0, y: 0 },
     texRotAxis: { x: 0, y: 0 },
     texRotAngle: 0,
   };
@@ -115,10 +156,6 @@ function initTweakpane() {
   pane.addInput(PARAMS, "texScale", {
     x: { step: 0.1, min: 1 },
     y: { step: 0.1, min: 1 },
-  });
-  pane.addInput(PARAMS, "texPivot", {
-    x: { step: 0.1, min: -1 },
-    y: { step: 0.1, min: -1 },
   });
 
   pane.addInput(PARAMS, "texRotAxis", {
@@ -138,7 +175,7 @@ function initTweakpane() {
 function loadImage(): Promise<HTMLImageElement> {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image();
-    image.src = "/subject_ms-VGGI/texture1024x1024.jpg";
+    image.src = "/subject_ms-VR/texture1024x1024.jpg";
     image.onerror = (e) => reject(e);
     image.onload = () => {
       resolve(image);
@@ -191,13 +228,6 @@ export function init(attachRoot: HTMLElement) {
         program.setUniform(Uniforms.TextureScale, scale);
       }
 
-      if (e.presetKey === "texPivot") {
-        console.log(e.value);
-        const { x, y } = e.value;
-        const scale = new Vector2(x, y);
-        program.setUniform(Uniforms.TexturePivot, scale);
-      }
-
       if (e.presetKey === "texRotAxis") {
         const { x, y } = e.value;
         const axis = new Vector2(x, y);
@@ -216,19 +246,6 @@ export function init(attachRoot: HTMLElement) {
       program.setTexture(image);
       draw(gl, program, surface, rotator);
     });
-
-    document.onkeydown = (e) => {
-      if (e.key === "ArrowUp") {
-        program.setUniform(Uniforms.TexturePivot, [1, 0]);
-      } else if (e.key === "ArrowDown") {
-        program.setUniform(Uniforms.TexturePivot, [-1, 0]);
-      } else if (e.key === "ArrowLeft") {
-        program.setUniform(Uniforms.TexturePivot, [0, -1]);
-      } else if (e.key === "ArrowRight") {
-        program.setUniform(Uniforms.TexturePivot, [0, 1]);
-      }
-    };
-
     attachRoot.appendChild(canvas);
   } catch (e) {
     console.error(e);
