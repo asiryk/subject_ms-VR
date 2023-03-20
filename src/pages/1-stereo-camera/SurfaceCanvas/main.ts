@@ -1,7 +1,7 @@
 import fragment from "./fragment.glsl";
 import vertex from "./vertex.glsl";
 import { TrackballRotator } from "../../../lib/trackball-rotator.js";
-import { Matrix4, Vector3, toRadians, Vector2 } from "@math.gl/core";
+import { Matrix4, Vector3, toRadians, Vector2, radians } from "@math.gl/core";
 import { Program, initCanvas } from "../../../lib/webGL";
 import { Pane, TpChangeEvent } from "tweakpane";
 
@@ -68,9 +68,65 @@ function draw(
   gl.clearColor(0, 0, 0, 1);
   // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // removes black bg
 
-  drawLeft(gl, program, surface, rotator);
+  // drawLeft(gl, program, surface, rotator);
   drawRight(gl, program, surface, rotator);
 
+}
+
+function leftFrustum(
+  aspectRatio: number,
+  eyeSeparation: number, // eye separation parameter
+  convergence: number, // convergence distance
+  fov: number, // field of view
+  near: number, // near clipping distance
+  far = Infinity, // far of the frustum
+) {
+  const top = near * Math.tan(fov / 2);
+  const bottom = -top;
+
+  const a = aspectRatio * Math.tan(fov / 2) * convergence;
+  const b = a - eyeSeparation / 2;
+  const c = a + eyeSeparation / 2;
+
+  const left = -b * near / convergence;
+  const right = c * near / convergence;
+
+  return new Matrix4().frustum({
+    top,
+    right,
+    bottom,
+    left,
+    near,
+    far,
+  });
+}
+
+function rightFrustum(
+  aspectRatio: number,
+  eyeSeparation: number, // eye separation parameter
+  convergence: number, // convergence distance
+  fov: number, // field of view
+  near: number, // near clipping distance
+  far = Infinity, // far of the frustum
+) {
+  const top = near * Math.tan(fov / 2);
+  const bottom = -top;
+
+  const a = aspectRatio * Math.tan(fov / 2) * convergence;
+  const b = a - eyeSeparation / 2;
+  const c = a + eyeSeparation / 2;
+
+  const left = -c * near / convergence;
+  const right = b * near / convergence;
+
+  return new Matrix4().frustum({
+    top,
+    right,
+    bottom,
+    left,
+    near,
+    far,
+  });
 }
 
 // draw shape for left eye
@@ -114,18 +170,22 @@ function drawRight(
   surface: Vector3[],
   rotator: TrackballRotator
 ) {
-  const projection = new Matrix4().ortho({
-    left: 1,
-    right: -1,
-    bottom: 1,
-    top: -1,
-  });
+
+  const eyeSeparation = 0.01;  // 12 pixels for a near clipping distance of 1.0
+  const nearClippingDistance = 0.0001;  // in units
+  const convergenceDistance = 1;  // in units
+  const fieldOfView = radians(15);  // in degrees
+  const aspectRatio = gl.canvas.width / gl.canvas.height;
+
+  const projection = rightFrustum(aspectRatio,
+    eyeSeparation, convergenceDistance, fieldOfView, nearClippingDistance, 12);
 
   const rotatorView = rotator.getViewMatrix();
   const rotateToPointZero = new Matrix4().rotateAxis(
     1.5,
     new Vector3(1, 1, -1)
   );
+
   const translateToPointZero = new Matrix4().translate(new Vector3(0, 0, -10));
   const matAccum0 = rotateToPointZero.multiplyRight(rotatorView);
   const modelView = translateToPointZero.multiplyRight(matAccum0);
