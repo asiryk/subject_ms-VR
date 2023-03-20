@@ -235,9 +235,13 @@ function drawRight(
 
 
 function initTweakpane() {
+  const container = document.createElement("div");
+  document.body.appendChild(container);
+  container.style.position = "absolute";
+  container.style.top = "8px";
+  container.style.left = "8px";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pane = new Pane() as any;
-
+  const pane = new Pane({ container }) as any;
   const PARAMS = {
     light: { x: 1, y: 1, z: 10 },
     texScale: { x: 0, y: 0 },
