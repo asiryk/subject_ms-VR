@@ -21,14 +21,24 @@ enum Attributes {
   Uvs = "a_tex_coord_uv",
 }
 
+class Camera {
+  constructor(
+    public eyeSeparation: number,
+    public convergence: number,
+    public fov: number,
+    public near: number,
+    public far: number,
+  ) {}
+}
+
 function createVertices(): { vertices: Vector3[]; uvs: Vector2[] } {
   const vertices: Vector3[] = [];
   const uvs: Vector2[] = [];
-  const INT_MULT = 10;
+  const INT_MULT = 10; // multiplier to avoid float precision
   const DEG = 360;
   const H = 1;
   const P = 0.5;
-  const zStep = H / 10;
+  const zStep = H / 10; // 10 steps for H to draw
   const bStep = DEG / 72;
 
   const toVertex = (z: number, b: number) => {
@@ -62,14 +72,19 @@ function draw(
   gl: WebGLRenderingContext,
   program: Program<Attributes, Uniforms>,
   surface: Vector3[],
-  rotator: TrackballRotator
+  rotator: TrackballRotator,
+  camera: Camera,
 ) {
   program.use(gl.useProgram.bind(gl));
   gl.clearColor(0, 0, 0, 1);
-  // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // removes black bg
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // removes black bg
 
-  // drawLeft(gl, program, surface, rotator);
-  drawRight(gl, program, surface, rotator);
+  gl.clear(gl.DEPTH_BUFFER_BIT);
+  gl.colorMask(true, false, false, true);
+  drawLeft(gl, program, surface, rotator, camera);
+  gl.clear(gl.DEPTH_BUFFER_BIT);
+  gl.colorMask(false, true, true, true);
+  drawRight(gl, program, surface, rotator, camera);
 
 }
 
@@ -134,23 +149,42 @@ function drawLeft(
   gl: WebGLRenderingContext,
   program: Program<Attributes, Uniforms>,
   surface: Vector3[],
-  rotator: TrackballRotator
+  rotator: TrackballRotator,
+  camera: Camera,
 ) {
-  const projection = new Matrix4().ortho({
-    left: 1,
-    right: -1,
-    bottom: 1,
-    top: -1,
-  });
+
+  const aspectRatio = gl.canvas.width / gl.canvas.height;
+  const {eyeSeparation, convergence, fov, near, far} = camera;
+
+  const projection = leftFrustum(aspectRatio, eyeSeparation, convergence, fov, near, far);
 
   const rotatorView = rotator.getViewMatrix();
   const rotateToPointZero = new Matrix4().rotateAxis(
     1.5,
     new Vector3(1, 1, -1)
   );
-  const translateToPointZero = new Matrix4().translate(new Vector3(0, 0, -10));
-  const matAccum0 = rotateToPointZero.multiplyRight(rotatorView);
-  const modelView = translateToPointZero.multiplyRight(matAccum0);
+                                  
+  //          Y |                    
+  //            |                    
+  //            |   /                
+  //            |  /                 
+  //            | /                  
+  //            |/                   
+  //------------/--------------------
+  //           /|                   X
+  //          / |                    
+  //         /  |                    
+  //        /   |                    
+  //       /    |                    
+  //      /                          
+  //     /  Z                        
+  // shift by -20 because Z-axis looking at us
+
+  const translateToPointZero = new Matrix4().translate(new Vector3(0, 0, -20));
+  const moveLeftEye = new Matrix4().translate(new Vector3(-eyeSeparation / 2, 0, 0));
+  const translate = translateToPointZero.multiplyRight(moveLeftEye);
+  const rotate = rotateToPointZero.multiplyRight(rotatorView);
+  const modelView = translate.multiplyRight(rotate);
 
   // create normal matrix from modelView matrix
   const normalMatrix = new Matrix4().copy(modelView).invert().transpose();
@@ -168,17 +202,14 @@ function drawRight(
   gl: WebGLRenderingContext,
   program: Program<Attributes, Uniforms>,
   surface: Vector3[],
-  rotator: TrackballRotator
+  rotator: TrackballRotator,
+  camera: Camera,
 ) {
 
-  const eyeSeparation = 0.01;  // 12 pixels for a near clipping distance of 1.0
-  const nearClippingDistance = 0.0001;  // in units
-  const convergenceDistance = 1;  // in units
-  const fieldOfView = radians(15);  // in degrees
+  const {eyeSeparation, convergence, fov, near, far} = camera;
   const aspectRatio = gl.canvas.width / gl.canvas.height;
 
-  const projection = rightFrustum(aspectRatio,
-    eyeSeparation, convergenceDistance, fieldOfView, nearClippingDistance, 12);
+  const projection = rightFrustum(aspectRatio, eyeSeparation, convergence, fov, near, far);
 
   const rotatorView = rotator.getViewMatrix();
   const rotateToPointZero = new Matrix4().rotateAxis(
@@ -186,9 +217,11 @@ function drawRight(
     new Vector3(1, 1, -1)
   );
 
-  const translateToPointZero = new Matrix4().translate(new Vector3(0, 0, -10));
-  const matAccum0 = rotateToPointZero.multiplyRight(rotatorView);
-  const modelView = translateToPointZero.multiplyRight(matAccum0);
+  const translateToPointZero = new Matrix4().translate(new Vector3(0, 0, -20));
+  const moveLeftEye = new Matrix4().translate(new Vector3(eyeSeparation / 2, 0, 0));
+  const translate = translateToPointZero.multiplyRight(moveLeftEye);
+  const rotate = rotateToPointZero.multiplyRight(rotatorView);
+  const modelView = translate.multiplyRight(rotate);
 
   // create normal matrix from modelView matrix
   const normalMatrix = new Matrix4().copy(modelView).invert().transpose();
@@ -205,28 +238,69 @@ function initTweakpane() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const pane = new Pane() as any;
 
+
+    // public eyeSeparation: number,
+    // public convergence: number,
+    // public fov: number,
+    // public near: number,
+    // public far: number,
+
+  // const eyeSeparation = 0.004;
+  // const convergence = 1;
+  // const fov = radians(15);
+  // const near = 0.001;
+  // const far = 30;
+
   const PARAMS = {
-    light: { x: 0, y: 0, z: 0 },
+    light: { x: 1, y: 1, z: 10 },
     texScale: { x: 0, y: 0 },
     texRotAxis: { x: 0, y: 0 },
     texRotAngle: 0,
+    cEyeSeparation: 0.004,
+    cConvergence: 1,
+    cFov: 15,
   };
 
   pane.addInput(PARAMS, "light", {});
-  pane.addInput(PARAMS, "texScale", {
+
+  const fTexture = pane.addFolder({
+    title: "texture",
+    expanded: false,
+  });
+
+  fTexture.addInput(PARAMS, "texScale", {
     x: { step: 0.1, min: 1 },
     y: { step: 0.1, min: 1 },
   });
 
-  pane.addInput(PARAMS, "texRotAxis", {
+  fTexture.addInput(PARAMS, "texRotAxis", {
     x: { step: 0.1 },
     y: { step: 0.1 },
   });
 
-  pane.addInput(PARAMS, "texRotAngle", {
+  fTexture.addInput(PARAMS, "texRotAngle", {
     step: 1,
     min: -360,
     max: 360,
+  });
+
+  const fStereo = pane.addFolder({
+    title: "stereo camera",
+  })
+
+  fStereo.addInput(PARAMS, "cEyeSeparation", {
+    step: 0.001,
+    min: 0.001,
+    max: 0.01,
+  });
+
+  fStereo.addInput(PARAMS, "cConvergence", {
+    min: 0,
+    max: 10,
+  });
+  fStereo.addInput(PARAMS, "cFov", {
+    min: 0,
+    max: 90,
   });
 
   return pane;
@@ -265,16 +339,25 @@ export function init(attachRoot: HTMLElement) {
       uvs.flatMap((v) => v),
       uvs[0].length
     );
-    const rotator = new TrackballRotator(canvas, null, 0);
-    rotator.setCallback(() => draw(gl, program, surface, rotator));
-    draw(gl, program, surface, rotator);
 
+    const eyeSeparation = 0.004;
+    const convergence = 1;
+    const fov = radians(15);
+    const near = 0.001;
+    const far = 30;
     const pane = initTweakpane();
+    const camera = new Camera(eyeSeparation, convergence, fov, near, far);
+
+   const rotator = new TrackballRotator(canvas, null, 0);
+
+    rotator.setCallback(() => draw(gl, program, surface, rotator, camera));
+    draw(gl, program, surface, rotator, camera);
+
     program.setUniform(Uniforms.TextureScale, new Vector2(1, 1));
-    program.setUniform(Uniforms.LightPosition, new Vector3(0, 0, 0));
+    program.setUniform(Uniforms.LightPosition, new Vector3(1, 1, 10));
     program.setUniform(Uniforms.TextureRotAxis, new Vector2(0, 0));
     program.setUniform(Uniforms.TextureRotAngleDeg, 0);
-    draw(gl, program, surface, rotator);
+    draw(gl, program, surface, rotator, camera);
     pane.on("change", (e: TpChangeEvent) => {
       if (e.presetKey === "light") {
         const { x, y, z } = e.value;
@@ -299,12 +382,24 @@ export function init(attachRoot: HTMLElement) {
         program.setUniform(Uniforms.TextureRotAngleDeg, deg);
       }
 
-      draw(gl, program, surface, rotator);
+      if (e.presetKey === "cEyeSeparation") {
+        camera.eyeSeparation = e.value;
+      }
+
+      if (e.presetKey === "cConvergence") {
+        camera.convergence = e.value;
+      }
+
+      if (e.presetKey === "cFov") {
+        camera.fov = radians(e.value);
+      }
+
+      draw(gl, program, surface, rotator, camera);
     });
 
     loadImage().then((image) => {
       program.setTexture(image);
-      draw(gl, program, surface, rotator);
+      draw(gl, program, surface, rotator, camera);
     });
     attachRoot.appendChild(canvas);
   } catch (e) {
