@@ -1,3 +1,4 @@
+attribute vec2 a_background;
 attribute vec3 a_vertex;
 attribute vec2 a_tex_coord_uv;
 
@@ -8,7 +9,9 @@ uniform vec2 u_texture_scale;
 uniform vec2 u_texture_center; // scaling and rotation center
 uniform vec2 u_texture_rot_axis; // rotation axis
 uniform float u_texture_rot_angle_deg; // rotation angle in degrees
+uniform float u_background_flag; // use different vertices to render bg
 
+varying vec2 v_background; // background position
 varying vec3 v_vertex; // raw vertex position
 varying vec3 v_vertex_position; // vertex position in camera space
 varying vec2 v_tex_coord_uv; // texture coordinate
@@ -91,7 +94,7 @@ vec2 rotate_around_pivot(vec2 point, vec2 pivot, vec2 axis, float angle_deg) {
   return vec2(trb * vec4(point, 0.0, 0.0));
 }
 
-void main() {
+vec4 draw_shape() {
   mat4 transformation_matrix = projection_matrix * model_view_matrix;
   vec4 position = transformation_matrix * vec4(a_vertex, 1.0);
 
@@ -102,7 +105,7 @@ void main() {
       a_tex_coord_uv,
       u_texture_center,
       u_texture_scale
-    ); 
+    );
 
   vec2 tex_rotated = rotate_around_pivot(
       tex_scaled,
@@ -113,5 +116,19 @@ void main() {
 
   v_tex_coord_uv = tex_rotated;
 
-  gl_Position = position;
+  return position;
+}
+
+vec4 draw_background() {
+  v_background = a_background;
+  vec4 position = vec4(a_background.x, a_background.y, 0., 1.);
+  return position;
+}
+
+void main() {
+  if (u_background_flag == 1.0) {
+    gl_Position = draw_background();
+  } else {
+    gl_Position = draw_shape();
+  }
 }
