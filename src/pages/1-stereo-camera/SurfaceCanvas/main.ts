@@ -77,7 +77,7 @@ function draw(
 ) {
   program.use(gl.useProgram.bind(gl));
   gl.clearColor(0, 0, 0, 1);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // removes black bg
+  // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // removes black bg
 
   gl.clear(gl.DEPTH_BUFFER_BIT);
   gl.colorMask(true, false, false, true);
@@ -321,6 +321,18 @@ export function init(attachRoot: HTMLElement) {
   try {
     const size = Math.min(600, window.innerWidth - 50);
     const { gl, canvas } = initCanvas(size, size);
+
+    const videoElement = document.querySelector('video');
+
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        videoElement.srcObject = stream;
+        videoElement.play();
+      })
+      .catch(error => {
+        console.error('Error accessing user media', error);
+      });
+
     const program = new Program(
       gl,
       vertex,
