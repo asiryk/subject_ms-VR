@@ -4,6 +4,7 @@
   precision mediump float;
 #endif
 
+varying vec2 v_background; // background position
 varying vec3 v_vertex;
 varying vec3 v_vertex_position;
 varying vec2 v_tex_coord_uv;
@@ -11,6 +12,7 @@ varying vec2 v_tex_coord_uv;
 uniform mat4 normal_matrix;
 uniform vec3 light_position;
 uniform sampler2D u_texture;
+uniform float u_background_flag; // use different color for bg
 
 vec3 calculate_light(vec3 position) {
   vec3 shape_color = vec3(0.7, 0.7, 0.7);
@@ -39,8 +41,22 @@ vec3 calculate_light(vec3 position) {
   return ambient + diffuse + specular;
 }
 
-void main() {
+vec4 draw_shape() {
   vec4 light = vec4(calculate_light(v_vertex_position), 1.0);
   vec4 tex = texture2D(u_texture, v_tex_coord_uv);
-  gl_FragColor = tex * light;
+
+  return tex * light;
+}
+
+vec4 draw_background() {
+  vec4 tex = texture2D(u_texture, v_background);
+  return tex;
+}
+
+void main() {
+  if (u_background_flag == 1.) {
+    gl_FragColor = draw_background();
+  } else {
+    gl_FragColor = draw_shape();
+  }
 }

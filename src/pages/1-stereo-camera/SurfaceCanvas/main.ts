@@ -14,9 +14,11 @@ enum Uniforms {
   TexturePivot = "u_texture_center",
   TextureRotAxis = "u_texture_rot_axis",
   TextureRotAngleDeg = "u_texture_rot_angle_deg",
+  BackgroundFlag = "u_background_flag",
 }
 
 enum Attributes {
+  Background = "a_background",
   Vertices = "a_vertex",
   Uvs = "a_tex_coord_uv",
 }
@@ -79,12 +81,16 @@ function draw(
   gl.clearColor(0, 0, 0, 1);
   // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // removes black bg
 
-  gl.clear(gl.DEPTH_BUFFER_BIT);
-  gl.colorMask(true, false, false, true);
-  drawLeft(gl, program, surface, rotator, camera);
-  gl.clear(gl.DEPTH_BUFFER_BIT);
-  gl.colorMask(false, true, true, true);
-  drawRight(gl, program, surface, rotator, camera);
+  // draw background camera
+  program.setUniform(Uniforms.BackgroundFlag, 1);
+  gl.drawArrays(gl.TRIANGLES, 0, 2 * 3); // 2 2d triangles
+
+  // gl.clear(gl.DEPTH_BUFFER_BIT);
+  // gl.colorMask(true, false, false, true);
+  // drawLeft(gl, program, surface, rotator, camera);
+  // gl.clear(gl.DEPTH_BUFFER_BIT);
+  // gl.colorMask(false, true, true, true);
+  // drawRight(gl, program, surface, rotator, camera);
 
 }
 
@@ -235,22 +241,13 @@ function drawRight(
 
 
 function initTweakpane() {
+  const container = document.createElement("div");
+  document.body.appendChild(container);
+  container.style.position = "absolute";
+  container.style.top = "8px";
+  container.style.left = "8px";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pane = new Pane() as any;
-
-
-    // public eyeSeparation: number,
-    // public convergence: number,
-    // public fov: number,
-    // public near: number,
-    // public far: number,
-
-  // const eyeSeparation = 0.004;
-  // const convergence = 1;
-  // const fov = radians(15);
-  // const near = 0.001;
-  // const far = 30;
-
+  const pane = new Pane({ container }) as any;
   const PARAMS = {
     light: { x: 1, y: 1, z: 10 },
     texScale: { x: 0, y: 0 },
@@ -350,6 +347,18 @@ export function init(attachRoot: HTMLElement) {
       Attributes.Uvs,
       uvs.flatMap((v) => v),
       uvs[0].length
+    );
+    // note: 0,0 is canvas center
+    program.setAttribute(
+      Attributes.Background,
+      [
+        // first triangle
+        -1,-1, -1,1, 1,1,
+        // second triangle
+        1,1, 1,-1, -1,-1,
+        // 1, 1, 
+      ],
+      2
     );
 
     const eyeSeparation = 0.004;
