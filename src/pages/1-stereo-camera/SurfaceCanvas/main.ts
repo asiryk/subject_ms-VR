@@ -250,6 +250,7 @@ function initTweakpane() {
     cEyeSeparation: 0.004,
     cConvergence: 1,
     cFov: 15,
+    cNear: 0.001,
   };
 
   pane.addInput(PARAMS, "light", {});
@@ -292,6 +293,10 @@ function initTweakpane() {
   fStereo.addInput(PARAMS, "cFov", {
     min: 0,
     max: 90,
+  });
+  fStereo.addInput(PARAMS, "cNear", {
+    min: 0.001,
+    max: 22,
   });
 
   return pane;
@@ -395,6 +400,10 @@ export function init(attachRoot: HTMLElement) {
 
       if (e.presetKey === "cFov") {
         camera.fov = radians(e.value);
+      }
+
+      if (e.presetKey === "cNear") {
+        camera.near = e.value;
       }
 
       draw(gl, program, surface, rotator, camera);
