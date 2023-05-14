@@ -318,17 +318,20 @@ export function init(attachRoot: HTMLElement) {
     const size = Math.min(600, window.innerWidth - 50);
     const { gl, canvas } = initCanvas(size, size);
 
-    const videoElement = document.querySelector('video');
+    // const mag = new Magnetometer();
+    // console.log(mag);
 
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => {
-        videoElement.srcObject = stream;
-        videoElement.play();
-      })
-      .catch(error => {
-        console.error('Error accessing user media', error);
-      });
-
+    // const videoElement = document.querySelector('video');
+    //
+    // navigator.mediaDevices.getUserMedia({ video: true })
+    //   .then(stream => {
+    //     videoElement.srcObject = stream;
+    //     videoElement.play();
+    //   })
+    //   .catch(error => {
+    //     console.error('Error accessing user media', error);
+    //   });
+    //
     const program = new Program(
       gl,
       vertex,

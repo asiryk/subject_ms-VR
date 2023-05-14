@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@math.gl/core": "3.6.3",
+    "astrojs-service-worker": "^1.0.0",
     "tweakpane": "3.1.7"
   }
 }
