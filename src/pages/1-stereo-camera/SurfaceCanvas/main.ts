@@ -416,6 +416,18 @@ export function init(attachRoot: HTMLElement) {
       program.setTexture(image);
       draw(gl, program, surface, rotator, camera);
     });
+
+    // init magnetometer
+    if ("Magnetometer" in window) {
+      const magSensor = new Magnetometer({ frequency: 60 });
+      magSensor.addEventListener("reading", () => {
+        console.log(`(${magSensor.x}, ${magSensor.y}, ${magSensor.z})`);
+      });
+      magSensor.start();
+
+    } else {
+      console.error("Magnetometer API is not supported");
+    }
     attachRoot.appendChild(canvas);
   } catch (e) {
     console.error(e);
