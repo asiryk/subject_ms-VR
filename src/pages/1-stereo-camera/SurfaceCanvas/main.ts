@@ -278,6 +278,7 @@ function initTweakpane() {
 
   const fStereo = pane.addFolder({
     title: "stereo camera",
+    expanded: false,
   })
 
   fStereo.addInput(PARAMS, "cEyeSeparation", {
@@ -420,7 +421,10 @@ export function init(attachRoot: HTMLElement) {
     // init magnetometer
     if ("Magnetometer" in window) {
       const magSensor = new Magnetometer({ frequency: 60 });
-      magSensor.addEventListener("reading", () => {
+      magSensor.addEventListener("reading", (e) => {
+        const rotationY = Math.atan2(e.x, e.z);
+        const rotationMatrix = new Matrix4().rotateY(rotationY);
+        console.dir(rotationMatrix);
         console.log(`(${magSensor.x}, ${magSensor.y}, ${magSensor.z})`);
       });
       magSensor.start();
