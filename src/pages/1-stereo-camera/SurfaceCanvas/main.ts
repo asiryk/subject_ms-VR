@@ -422,7 +422,8 @@ export function init(attachRoot: HTMLElement) {
     if ("Magnetometer" in window) {
       const magSensor = new Magnetometer({ frequency: 60 });
       magSensor.addEventListener("reading", (e) => {
-        const rotationY = Math.atan2(e.x, e.z);
+        console.log(e);
+        const rotationY = Math.atan2(magSensor.x, magSensor.z);
         const rotationMatrix = new Matrix4().rotateY(rotationY);
         console.dir(rotationMatrix);
         console.log(`(${magSensor.x}, ${magSensor.y}, ${magSensor.z})`);
