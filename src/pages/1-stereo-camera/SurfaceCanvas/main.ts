@@ -74,6 +74,7 @@ function draw(
   surface: Vector3[],
   rotator: TrackballRotator,
   camera: Camera,
+  rotationMatrix: Matrix4
 ) {
   program.use(gl.useProgram.bind(gl));
   gl.clearColor(0, 0, 0, 1);
@@ -81,10 +82,10 @@ function draw(
 
   gl.clear(gl.DEPTH_BUFFER_BIT);
   gl.colorMask(true, false, false, true);
-  drawLeft(gl, program, surface, rotator, camera);
+  drawLeft(gl, program, surface, rotator, camera, rotationMatrix);
   gl.clear(gl.DEPTH_BUFFER_BIT);
   gl.colorMask(false, true, true, true);
-  drawRight(gl, program, surface, rotator, camera);
+  drawRight(gl, program, surface, rotator, camera, rotationMatrix);
 
 }
 
@@ -151,6 +152,7 @@ function drawLeft(
   surface: Vector3[],
   rotator: TrackballRotator,
   camera: Camera,
+  sensorRotation: Matrix4,
 ) {
 
   const aspectRatio = gl.canvas.width / gl.canvas.height;
@@ -183,7 +185,7 @@ function drawLeft(
   const translateToPointZero = new Matrix4().translate(new Vector3(0, 0, -20));
   const moveLeftEye = new Matrix4().translate(new Vector3(-eyeSeparation / 2, 0, 0));
   const translate = translateToPointZero.multiplyRight(moveLeftEye);
-  const rotate = rotateToPointZero.multiplyRight(rotatorView);
+  const rotate = rotateToPointZero.multiplyRight(rotatorView).multiplyRight(sensorRotation);
   const modelView = translate.multiplyRight(rotate);
 
   // create normal matrix from modelView matrix
@@ -204,6 +206,7 @@ function drawRight(
   surface: Vector3[],
   rotator: TrackballRotator,
   camera: Camera,
+  sensorRotation: Matrix4,
 ) {
 
   const {eyeSeparation, convergence, fov, near, far} = camera;
@@ -220,7 +223,7 @@ function drawRight(
   const translateToPointZero = new Matrix4().translate(new Vector3(0, 0, -20));
   const moveLeftEye = new Matrix4().translate(new Vector3(eyeSeparation / 2, 0, 0));
   const translate = translateToPointZero.multiplyRight(moveLeftEye);
-  const rotate = rotateToPointZero.multiplyRight(rotatorView);
+  const rotate = rotateToPointZero.multiplyRight(rotatorView).multiplyRight(sensorRotation);
   const modelView = translate.multiplyRight(rotate);
 
   // create normal matrix from modelView matrix
@@ -361,15 +364,16 @@ export function init(attachRoot: HTMLElement) {
     const camera = new Camera(eyeSeparation, convergence, fov, near, far);
 
    const rotator = new TrackballRotator(canvas, null, 0);
+    const dummyRotation = new Matrix4().identity();
 
-    rotator.setCallback(() => draw(gl, program, surface, rotator, camera));
-    draw(gl, program, surface, rotator, camera);
+    rotator.setCallback(() => draw(gl, program, surface, rotator, camera, dummyRotation));
+    draw(gl, program, surface, rotator, camera, dummyRotation);
 
     program.setUniform(Uniforms.TextureScale, new Vector2(1, 1));
     program.setUniform(Uniforms.LightPosition, new Vector3(1, 1, 10));
     program.setUniform(Uniforms.TextureRotAxis, new Vector2(0, 0));
     program.setUniform(Uniforms.TextureRotAngleDeg, 0);
-    draw(gl, program, surface, rotator, camera);
+    draw(gl, program, surface, rotator, camera, dummyRotation);
     pane.on("change", (e: TpChangeEvent) => {
       if (e.presetKey === "light") {
         const { x, y, z } = e.value;
@@ -410,23 +414,23 @@ export function init(attachRoot: HTMLElement) {
         camera.near = e.value;
       }
 
-      draw(gl, program, surface, rotator, camera);
+      draw(gl, program, surface, rotator, camera, dummyRotation);
     });
 
     loadImage().then((image) => {
       program.setTexture(image);
-      draw(gl, program, surface, rotator, camera);
+      draw(gl, program, surface, rotator, camera, dummyRotation);
     });
 
     // init magnetometer
     if ("Magnetometer" in window) {
       const magSensor = new Magnetometer({ frequency: 60 });
       magSensor.addEventListener("reading", (e) => {
-        console.log(e);
-        const rotationY = Math.atan2(magSensor.x, magSensor.z);
+        const sensor = e.target;
+        const rotationY = Math.atan2(sensor.x, sensor.z);
         const rotationMatrix = new Matrix4().rotateY(rotationY);
-        console.dir(rotationMatrix);
-        console.log(`(${magSensor.x}, ${magSensor.y}, ${magSensor.z})`);
+
+        draw(gl, program, surface, rotator, camera, rotationMatrix);
       });
       magSensor.start();
 
