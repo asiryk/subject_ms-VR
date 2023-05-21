@@ -37,7 +37,6 @@
 /* eslint-disable indent, no-unused-vars, no-multiple-empty-lines, max-nested-callbacks, space-before-function-paren, quotes, comma-spacing */
 'use strict';
 
-var precacheConfig = [["images/app-icon-128.png","c9980d74f81a11cac97202ef45ba6df0"],["images/app-icon-144.png","e8d8bd779517d0bf268776e24cf6c7ec"],["images/app-icon-192.png","53c83a57d45389a69ed315386ff6bcea"],["images/app-icon-32.png","fd07e8cc3101b59fd3171af98afe01f2"],["images/app-icon-48.png","5da8022befa5b1279ce9653f37dccd05"],["index.html","dd0ead6507f24936c4aa0d869c90bf1d"],["manifest.json","76ee53ea6435882675f766db25121996"]];
 var cacheName = 'sw-precache-v3--' + (self.registration ? self.registration.scope : '');
 
 
@@ -129,16 +128,7 @@ var stripIgnoredUrlParameters = function (originalUrl,
   };
 
 
-var hashParamName = '_sw-precache';
-var urlsToCacheKeys = new Map(
-  precacheConfig.map(function (item) {
-    var relativeUrl = item[0];
-    var hash = item[1];
-    var absoluteUrl = new URL(relativeUrl, self.location);
-    var cacheKey = createCacheKey(absoluteUrl, hashParamName, hash, false);
-    return [absoluteUrl.toString(), cacheKey];
-  })
-);
+var urlsToCacheKeys = new Map();
 
 function setOfCachedUrls(cache) {
   return cache.keys().then(function (requests) {
@@ -207,58 +197,58 @@ self.addEventListener('activate', function (event) {
 });
 
 
-self.addEventListener('fetch', function (event) {
-  if (event.request.method === 'GET') {
-    // Should we call event.respondWith() inside this fetch event handler?
-    // This needs to be determined synchronously, which will give other fetch
-    // handlers a chance to handle the request if need be.
-    var shouldRespond;
-
-    // First, remove all the ignored parameters and hash fragment, and see if we
-    // have that URL in our cache. If so, great! shouldRespond will be true.
-    var url = stripIgnoredUrlParameters(event.request.url, ignoreUrlParametersMatching);
-    shouldRespond = urlsToCacheKeys.has(url);
-
-    // If shouldRespond is false, check again, this time with 'index.html'
-    // (or whatever the directoryIndex option is set to) at the end.
-    var directoryIndex = '';
-    if (!shouldRespond && directoryIndex) {
-      url = addDirectoryIndex(url, directoryIndex);
-      shouldRespond = urlsToCacheKeys.has(url);
-    }
-
-    // If shouldRespond is still false, check to see if this is a navigation
-    // request, and if so, whether the URL matches navigateFallbackWhitelist.
-    var navigateFallback = 'index.html';
-    if (!shouldRespond &&
-        navigateFallback &&
-        (event.request.mode === 'navigate') &&
-        isPathWhitelisted(["\\/[^\\/\\.]*(\\?|$)"], event.request.url)) {
-      url = new URL(navigateFallback, self.location).toString();
-      shouldRespond = urlsToCacheKeys.has(url);
-    }
-
-    // If shouldRespond was set to true at any point, then call
-    // event.respondWith(), using the appropriate cache key.
-    if (shouldRespond) {
-      event.respondWith(
-        caches.open(cacheName).then(function (cache) {
-          return cache.match(urlsToCacheKeys.get(url)).then(function (response) {
-            if (response) {
-              return response;
-            }
-            throw Error('The cached response that was expected is missing.');
-          });
-        }).catch(function (e) {
-          // Fall back to just fetch()ing the request if some unexpected error
-          // prevented the cached response from being valid.
-          console.warn('Couldn\'t serve response for "%s" from cache: %O', event.request.url, e);
-          return fetch(event.request);
-        })
-      );
-    }
-  }
-});
+// self.addEventListener('fetch', function (event) {
+//   if (event.request.method === 'GET') {
+//     // Should we call event.respondWith() inside this fetch event handler?
+//     // This needs to be determined synchronously, which will give other fetch
+//     // handlers a chance to handle the request if need be.
+//     var shouldRespond;
+//
+//     // First, remove all the ignored parameters and hash fragment, and see if we
+//     // have that URL in our cache. If so, great! shouldRespond will be true.
+//     var url = stripIgnoredUrlParameters(event.request.url, ignoreUrlParametersMatching);
+//     shouldRespond = urlsToCacheKeys.has(url);
+//
+//     // If shouldRespond is false, check again, this time with 'index.html'
+//     // (or whatever the directoryIndex option is set to) at the end.
+//     var directoryIndex = '';
+//     if (!shouldRespond && directoryIndex) {
+//       url = addDirectoryIndex(url, directoryIndex);
+//       shouldRespond = urlsToCacheKeys.has(url);
+//     }
+//
+//     // If shouldRespond is still false, check to see if this is a navigation
+//     // request, and if so, whether the URL matches navigateFallbackWhitelist.
+//     var navigateFallback = 'index.html';
+//     if (!shouldRespond &&
+//         navigateFallback &&
+//         (event.request.mode === 'navigate') &&
+//         isPathWhitelisted(["\\/[^\\/\\.]*(\\?|$)"], event.request.url)) {
+//       url = new URL(navigateFallback, self.location).toString();
+//       shouldRespond = urlsToCacheKeys.has(url);
+//     }
+//
+//     // If shouldRespond was set to true at any point, then call
+//     // event.respondWith(), using the appropriate cache key.
+//     if (shouldRespond) {
+//       event.respondWith(
+//         caches.open(cacheName).then(function (cache) {
+//           return cache.match(urlsToCacheKeys.get(url)).then(function (response) {
+//             if (response) {
+//               return response;
+//             }
+//             throw Error('The cached response that was expected is missing.');
+//           });
+//         }).catch(function (e) {
+//           // Fall back to just fetch()ing the request if some unexpected error
+//           // prevented the cached response from being valid.
+//           console.warn('Couldn\'t serve response for "%s" from cache: %O', event.request.url, e);
+//           return fetch(event.request);
+//         })
+//       );
+//     }
+//   }
+// });
 
 
 // *** Start of auto-included sw-toolbox code. ***
