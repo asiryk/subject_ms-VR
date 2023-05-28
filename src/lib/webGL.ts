@@ -1,48 +1,27 @@
 import { NumericArray, Matrix4, Vector4, Vector3, Vector2 } from "@math.gl/core";
 
-export class Program<A extends string, U extends string> {
+export class Program {
   private readonly gl: WebGLRenderingContext;
   private readonly program: WebGLProgram;
-  private readonly attributes: Map<A, GLint>;
-  private readonly uniforms: Map<U, WebGLUniformLocation>;
 
   constructor(
     gl: WebGLRenderingContext,
     vertex: string,
     fragment: string,
-    attributes: A[],
-    uniforms: U[]
   ) {
     this.gl = gl;
-    this.uniforms = new Map();
 
     const vShader = this.createShader(this.gl.VERTEX_SHADER, vertex);
     const fShader = this.createShader(this.gl.FRAGMENT_SHADER, fragment);
     this.program = this.createProgram(vShader, fShader);
-
-    // Look up attribute locations (gpu memory)
-    this.attributes = new Map(
-      attributes.map((attr) => [
-        attr,
-        this.gl.getAttribLocation(this.program, attr),
-      ])
-    );
-
-    // Look up uniform locations (gpu memory)
-    this.uniforms = new Map(
-      uniforms.map((uniform) => [
-        uniform,
-        this.gl.getUniformLocation(this.program, uniform),
-      ])
-    );
   }
 
   public use(useProgram: (prog: WebGLProgram) => void): void {
     useProgram(this.program);
   }
 
-  public setUniform(uniform: U, cpuMem: NumericArray | number): void {
-    const gpuMem = this.uniforms.get(uniform);
+  public setUniform(uniform: string, cpuMem: NumericArray | number): void {
+    const gpuMem = this.gl.getUniformLocation(this.program, uniform);
     if (cpuMem instanceof Matrix4) {
       this.gl.uniformMatrix4fv(gpuMem, false, cpuMem);
     } else if (cpuMem instanceof Vector4) {
@@ -53,21 +32,20 @@ export class Program<A extends string, U extends string> {
       this.gl.uniform2fv(gpuMem, cpuMem);
     } else if (typeof cpuMem === "number") {
       this.gl.uniform1f(gpuMem, cpuMem);
-    }else {
+    } else {
       throw new Error("Unsupported type");
     }
   }
 
-  public setAttribute(attrubute: A, cpuMem: NumericArray, size: number): void {
+  public setAttribute(attribute: string, cpuMem: NumericArray, size: number): void {
     // https://web.archive.org/web/20221105152646/https://webglfundamentals.org/webgl/lessons/webgl-fundamentals.html
-    const type = this.gl.FLOAT;
     const cpuMemBuf = new Float32Array(cpuMem);
-    const gpuMem = this.attributes.get(attrubute);
+    const gpuMem = this.gl.getAttribLocation(this.program, attribute);
     const gpuBuffer = this.gl.createBuffer();
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER, gpuBuffer);
     this.gl.bufferData(this.gl.ARRAY_BUFFER, cpuMemBuf, this.gl.STREAM_DRAW);
     this.gl.enableVertexAttribArray(gpuMem);
-    this.gl.vertexAttribPointer(gpuMem, size, type, false, 0, 0);
+    this.gl.vertexAttribPointer(gpuMem, size, this.gl.FLOAT, false, 0, 0);
   }
 
   public setTexture(image: HTMLImageElement): void {

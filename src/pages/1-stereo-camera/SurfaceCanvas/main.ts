@@ -70,7 +70,7 @@ function createVertices(): { vertices: Vector3[]; uvs: Vector2[] } {
 
 function draw(
   gl: WebGLRenderingContext,
-  program: Program<Attributes, Uniforms>,
+  program: Program,
   surface: Vector3[],
   rotator: TrackballRotator,
   camera: Camera,
@@ -113,7 +113,7 @@ function leftFrustum(
 // draw shape for left eye
 function drawLeft(
   gl: WebGLRenderingContext,
-  program: Program<Attributes, Uniforms>,
+  program: Program,
   surface: Vector3[],
   rotator: TrackballRotator,
   camera: Camera,
@@ -250,13 +250,7 @@ export function init(attachRoot: HTMLElement) {
     const { gl, canvas } = initCanvas(size, size);
 
     //
-    const program = new Program(
-      gl,
-      vertex,
-      fragment,
-      Object.values(Attributes),
-      Object.values(Uniforms)
-    );
+    const program = new Program(gl, vertex, fragment);
     const { vertices: surface, uvs } = createVertices();
     program.setAttribute(
       Attributes.Vertices,
