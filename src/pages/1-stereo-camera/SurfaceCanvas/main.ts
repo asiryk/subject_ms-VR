@@ -14,9 +14,11 @@ enum Uniforms {
   TexturePivot = "u_texture_center",
   TextureRotAxis = "u_texture_rot_axis",
   TextureRotAngleDeg = "u_texture_rot_angle_deg",
+  DrawingSphere = "u_sphere_draw",
 }
 
 enum Attributes {
+  SphereVertices = "a_sphere_vertex",
   Vertices = "a_vertex",
   Uvs = "a_tex_coord_uv",
 }
@@ -68,10 +70,49 @@ function createVertices(): { vertices: Vector3[]; uvs: Vector2[] } {
   return { vertices, uvs };
 }
 
+function createSphere(): { vertices: Vector3[]; uvs: Vector2[] } {
+  const topOffset = 1.2;
+  const radius = 0.2;
+  const slices = 16;
+  const stacks = 16;
+  const vertices = [];
+  const uvs = [];
+
+  for(let stackNumber = 0; stackNumber <= stacks; stackNumber++) {
+    const theta = stackNumber * Math.PI / stacks;
+    const nextTheta = (stackNumber + 1) * Math.PI / stacks;
+
+    for(let sliceNumber = 0; sliceNumber <= slices; sliceNumber++) {
+      const phi = sliceNumber * 2 * Math.PI / slices;
+      const nextPhi = (sliceNumber + 1) * 2 * Math.PI / slices;
+
+      // Vertices for current slice
+      const x1 = radius * Math.sin(theta) * Math.cos(phi);
+      const y1 = radius * Math.cos(theta);
+      const z1 = radius * Math.sin(theta) * Math.sin(phi);
+      const u1 = sliceNumber / slices;
+      const v1 = stackNumber / stacks;
+
+      // Vertices for next slice
+      const x2 = radius * Math.sin(nextTheta) * Math.cos(nextPhi);
+      const y2 = radius * Math.cos(nextTheta);
+      const z2 = radius * Math.sin(nextTheta) * Math.sin(nextPhi);
+      const u2 = (sliceNumber + 1) / slices;
+      const v2 = (stackNumber + 1) / stacks;
+
+      vertices.push(new Vector3(x1, y1 + topOffset, z1));
+      vertices.push(new Vector3(x2, y2 + topOffset, z2));
+      uvs.push(new Vector2(u1, v1));
+      uvs.push(new Vector2(u2, v2));
+    }
+  }
+
+  return { vertices, uvs };
+}
+
 function draw(
   gl: WebGLRenderingContext,
   program: Program,
-  surface: Vector3[],
   rotator: TrackballRotator,
   camera: Camera,
   rotationMatrix: Matrix4
@@ -79,7 +120,7 @@ function draw(
   program.use(gl.useProgram.bind(gl));
   gl.clearColor(0, 0, 0, 1);
   gl.clear(gl.DEPTH_BUFFER_BIT); // removes black bg
-  drawLeft(gl, program, surface, rotator, camera, rotationMatrix);
+  drawLeft(gl, program, rotator, camera, rotationMatrix);
 }
 
 function leftFrustum(
@@ -114,7 +155,6 @@ function leftFrustum(
 function drawLeft(
   gl: WebGLRenderingContext,
   program: Program,
-  surface: Vector3[],
   rotator: TrackballRotator,
   camera: Camera,
   sensorRotation: Matrix4,
@@ -160,8 +200,11 @@ function drawLeft(
   program.setUniform(Uniforms.ProjectionMatrix, projection);
   program.setUniform(Uniforms.NormalMatrix, normalMatrix);
 
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, surface.length);
-
+  for (let i = 0, offset = 0; i < program.vertices.length; i++) {
+    const surface = program.vertices[i];
+    gl.drawArrays(gl.TRIANGLE_STRIP, offset, surface.length);
+    offset += surface.length;
+  }
 }
 
 function initTweakpane() {
@@ -249,19 +292,10 @@ export function init(attachRoot: HTMLElement) {
     const size = Math.min(600, window.innerWidth - 50);
     const { gl, canvas } = initCanvas(size, size);
 
-    //
     const program = new Program(gl, vertex, fragment);
     const { vertices: surface, uvs } = createVertices();
-    program.setAttribute(
-      Attributes.Vertices,
-      surface.flatMap((v) => v),
-      surface[0].length
-    );
-    program.setAttribute(
-      Attributes.Uvs,
-      uvs.flatMap((v) => v),
-      uvs[0].length
-    );
+    const {vertices: sphere, uvs: uvsSphere } = createSphere();
+    program.initBuffer(Attributes.Vertices, [surface, sphere], Attributes.Uvs, uvs.concat(uvsSphere));
 
     const eyeSeparation = 0.004;
     const convergence = 1;
@@ -274,14 +308,14 @@ export function init(attachRoot: HTMLElement) {
    const rotator = new TrackballRotator(canvas, null, 0);
     const dummyRotation = new Matrix4().identity();
 
-    rotator.setCallback(() => draw(gl, program, surface, rotator, camera, dummyRotation));
-    draw(gl, program, surface, rotator, camera, dummyRotation);
+    rotator.setCallback(() => draw(gl, program, rotator, camera, dummyRotation));
+    draw(gl, program, rotator, camera, dummyRotation);
 
     program.setUniform(Uniforms.TextureScale, new Vector2(1, 1));
     program.setUniform(Uniforms.LightPosition, new Vector3(1, 1, 10));
     program.setUniform(Uniforms.TextureRotAxis, new Vector2(0, 0));
     program.setUniform(Uniforms.TextureRotAngleDeg, 0);
-    draw(gl, program, surface, rotator, camera, dummyRotation);
+    draw(gl, program, rotator, camera, dummyRotation);
     pane.on("change", (e: TpChangeEvent) => {
       if (e.presetKey === "light") {
         const { x, y, z } = e.value;
@@ -322,12 +356,12 @@ export function init(attachRoot: HTMLElement) {
         camera.near = e.value;
       }
 
-      draw(gl, program, surface, rotator, camera, dummyRotation);
+      draw(gl, program, rotator, camera, dummyRotation);
     });
 
     loadImage().then((image) => {
       program.setTexture(image);
-      draw(gl, program, surface, rotator, camera, dummyRotation);
+      draw(gl, program, rotator, camera, dummyRotation);
     });
 
     // init magnetometer
@@ -344,7 +378,7 @@ export function init(attachRoot: HTMLElement) {
         .rotateY(rotationY)
         .rotateZ(rotationZ);
 
-        draw(gl, program, surface, rotator, camera, rotationMatrix);
+        draw(gl, program, rotator, camera, rotationMatrix);
       });
       magSensor.start();
 

@@ -3,6 +3,7 @@ import { NumericArray, Matrix4, Vector4, Vector3, Vector2 } from "@math.gl/core"
 export class Program {
   private readonly gl: WebGLRenderingContext;
   private readonly program: WebGLProgram;
+  public vertices: Vector3[][];
 
   constructor(
     gl: WebGLRenderingContext,
@@ -37,15 +38,29 @@ export class Program {
     }
   }
 
-  public setAttribute(attribute: string, cpuMem: NumericArray, size: number): void {
+  /**
+   * this method should be called only once.
+   * we are creating the buffer that shares multiple data
+   */
+  public initBuffer(attribName: string, vertices: Vector3[][], uvsName: string, uvsVec: Vector2[]): void {
     // https://web.archive.org/web/20221105152646/https://webglfundamentals.org/webgl/lessons/webgl-fundamentals.html
-    const cpuMemBuf = new Float32Array(cpuMem);
-    const gpuMem = this.gl.getAttribLocation(this.program, attribute);
-    const gpuBuffer = this.gl.createBuffer();
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, gpuBuffer);
-    this.gl.bufferData(this.gl.ARRAY_BUFFER, cpuMemBuf, this.gl.STREAM_DRAW);
-    this.gl.enableVertexAttribArray(gpuMem);
-    this.gl.vertexAttribPointer(gpuMem, size, this.gl.FLOAT, false, 0, 0);
+    const gl = this.gl;
+    this.vertices = vertices;
+
+    const allVertices = vertices.flatMap(v => v).flatMap(v => v);
+    const allUvs = uvsVec.flatMap(v => v);
+    const cpuBuffer = new Float32Array(allVertices.concat(allUvs));
+    const gpuBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, gpuBuffer);
+    gl.bufferData(this.gl.ARRAY_BUFFER, cpuBuffer, this.gl.STREAM_DRAW);
+
+    const attribute = gl.getAttribLocation(this.program, attribName);
+    gl.enableVertexAttribArray(attribute);
+    gl.vertexAttribPointer(attribute, vertices[0][0].length, this.gl.FLOAT, false, 0, 0);
+
+    const attribute2 = gl.getAttribLocation(this.program, uvsName);
+    gl.enableVertexAttribArray(attribute2);
+    gl.vertexAttribPointer(attribute2, uvsVec[0].length, this.gl.FLOAT, false, 0, allVertices.length * 4); // 4 = float bytes
   }
 
   public setTexture(image: HTMLImageElement): void {
