@@ -322,19 +322,6 @@ export function init(attachRoot: HTMLElement) {
     const size = Math.min(600, window.innerWidth - 50);
     const { gl, canvas } = initCanvas(size, size);
 
-    // const mag = new Magnetometer();
-    // console.log(mag);
-
-    // const videoElement = document.querySelector('video');
-    //
-    // navigator.mediaDevices.getUserMedia({ video: true })
-    //   .then(stream => {
-    //     videoElement.srcObject = stream;
-    //     videoElement.play();
-    //   })
-    //   .catch(error => {
-    //     console.error('Error accessing user media', error);
-    //   });
     //
     const program = new Program(
       gl,
@@ -427,8 +414,14 @@ export function init(attachRoot: HTMLElement) {
       const magSensor = new Magnetometer({ frequency: 60 });
       magSensor.addEventListener("reading", (e) => {
         const sensor = e.target;
-        const rotationY = Math.atan2(sensor.x, sensor.z);
-        const rotationMatrix = new Matrix4().rotateY(rotationY);
+        const rotationX = Math.atan2(sensor.y, sensor.z);  // Calculate rotation around X axis
+        const rotationY = Math.atan2(sensor.x, sensor.z);  // Calculate rotation around Y axis
+        const rotationZ = Math.atan2(sensor.y, sensor.x);  // Calculate rotation around Z axis
+
+        const rotationMatrix = new Matrix4()
+        .rotateX(rotationX)
+        .rotateY(rotationY)
+        .rotateY(rotationZ);
 
         draw(gl, program, surface, rotator, camera, rotationMatrix);
       });
