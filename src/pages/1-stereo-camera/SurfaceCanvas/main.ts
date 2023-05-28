@@ -421,7 +421,7 @@ export function init(attachRoot: HTMLElement) {
         const rotationMatrix = new Matrix4()
         .rotateX(rotationX)
         .rotateY(rotationY)
-        .rotateY(rotationZ);
+        .rotateZ(rotationZ);
 
         draw(gl, program, surface, rotator, camera, rotationMatrix);
       });
