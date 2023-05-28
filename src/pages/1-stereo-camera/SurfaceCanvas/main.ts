@@ -78,15 +78,8 @@ function draw(
 ) {
   program.use(gl.useProgram.bind(gl));
   gl.clearColor(0, 0, 0, 1);
-  // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); // removes black bg
-
-  gl.clear(gl.DEPTH_BUFFER_BIT);
-  gl.colorMask(true, false, false, true);
+  gl.clear(gl.DEPTH_BUFFER_BIT); // removes black bg
   drawLeft(gl, program, surface, rotator, camera, rotationMatrix);
-  gl.clear(gl.DEPTH_BUFFER_BIT);
-  gl.colorMask(false, true, true, true);
-  drawRight(gl, program, surface, rotator, camera, rotationMatrix);
-
 }
 
 function leftFrustum(
@@ -106,34 +99,6 @@ function leftFrustum(
 
   const left = -b * near / convergence;
   const right = c * near / convergence;
-
-  return new Matrix4().frustum({
-    top,
-    right,
-    bottom,
-    left,
-    near,
-    far,
-  });
-}
-
-function rightFrustum(
-  aspectRatio: number,
-  eyeSeparation: number, // eye separation parameter
-  convergence: number, // convergence distance
-  fov: number, // field of view
-  near: number, // near clipping distance
-  far = Infinity, // far of the frustum
-) {
-  const top = near * Math.tan(fov / 2);
-  const bottom = -top;
-
-  const a = aspectRatio * Math.tan(fov / 2) * convergence;
-  const b = a - eyeSeparation / 2;
-  const c = a + eyeSeparation / 2;
-
-  const left = -c * near / convergence;
-  const right = b * near / convergence;
 
   return new Matrix4().frustum({
     top,
@@ -198,44 +163,6 @@ function drawLeft(
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, surface.length);
 
 }
-
-// draw shape for right eye
-function drawRight(
-  gl: WebGLRenderingContext,
-  program: Program<Attributes, Uniforms>,
-  surface: Vector3[],
-  rotator: TrackballRotator,
-  camera: Camera,
-  sensorRotation: Matrix4,
-) {
-
-  const {eyeSeparation, convergence, fov, near, far} = camera;
-  const aspectRatio = gl.canvas.width / gl.canvas.height;
-
-  const projection = rightFrustum(aspectRatio, eyeSeparation, convergence, fov, near, far);
-
-  const rotatorView = rotator.getViewMatrix();
-  const rotateToPointZero = new Matrix4().rotateAxis(
-    1.5,
-    new Vector3(1, 1, -1)
-  );
-
-  const translateToPointZero = new Matrix4().translate(new Vector3(0, 0, -20));
-  const moveLeftEye = new Matrix4().translate(new Vector3(eyeSeparation / 2, 0, 0));
-  const translate = translateToPointZero.multiplyRight(moveLeftEye);
-  const rotate = rotateToPointZero.multiplyRight(rotatorView).multiplyRight(sensorRotation);
-  const modelView = translate.multiplyRight(rotate);
-
-  // create normal matrix from modelView matrix
-  const normalMatrix = new Matrix4().copy(modelView).invert().transpose();
-
-  program.setUniform(Uniforms.ModelViewMatrix, modelView);
-  program.setUniform(Uniforms.ProjectionMatrix, projection);
-  program.setUniform(Uniforms.NormalMatrix, normalMatrix);
-
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, surface.length);
-}
-
 
 function initTweakpane() {
   const container = document.createElement("div");
