@@ -190,7 +190,7 @@ function drawLeft(
   const translateToPointZero = new Matrix4().translate(new Vector3(0, 0, -20));
   const moveLeftEye = new Matrix4().translate(new Vector3(-eyeSeparation / 2, 0, 0));
   const translate = translateToPointZero.multiplyRight(moveLeftEye);
-  const rotate = rotateToPointZero.multiplyRight(rotatorView).multiplyRight(sensorRotation);
+  const rotate = rotateToPointZero.multiplyRight(rotatorView);
   const modelView = translate.multiplyRight(rotate);
 
   // create normal matrix from modelView matrix
@@ -200,11 +200,20 @@ function drawLeft(
   program.setUniform(Uniforms.ProjectionMatrix, projection);
   program.setUniform(Uniforms.NormalMatrix, normalMatrix);
 
-  for (let i = 0, offset = 0; i < program.vertices.length; i++) {
-    const surface = program.vertices[i];
-    gl.drawArrays(gl.TRIANGLE_STRIP, offset, surface.length);
-    offset += surface.length;
-  }
+  // 1. draw main surface first
+  let offset = 0;
+  let surface = program.vertices[0];
+  gl.drawArrays(gl.TRIANGLE_STRIP, offset, surface.length);
+
+  // 2. draw sphere surface
+  // modify modelView matrix first
+  const rotateWithSensor = rotate.multiplyRight(sensorRotation);
+  const modelView2 = translate.multiplyRight(rotateWithSensor);
+  program.setUniform(Uniforms.ModelViewMatrix, modelView2);
+
+  offset = surface.length;
+  surface = program.vertices[1];
+  gl.drawArrays(gl.TRIANGLE_STRIP, offset, surface.length);
 }
 
 function initTweakpane() {
