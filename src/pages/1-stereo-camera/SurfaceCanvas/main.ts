@@ -287,6 +287,37 @@ function loadImage(): Promise<HTMLImageElement> {
   });
 }
 
+async function initAudio() {
+  const audioContext = new AudioContext();
+  const decodedAudioData = await fetch("/subject_ms-VR/sound.mp3")
+    .then(response => response.arrayBuffer())
+    .then(audioData => audioContext.decodeAudioData(audioData));
+  const source = audioContext.createBufferSource();
+  source.buffer = decodedAudioData;
+  source.connect(audioContext.destination);
+  source.start();
+
+  while(audioContext.state === "suspended") {
+    await new Promise(resolve => window.setTimeout(resolve, 2000));
+    audioContext.resume();
+  }
+
+  const mainVolume = audioContext.createGain();
+  const panner = audioContext.createPanner();
+  const volume = audioContext.createGain();
+  volume.connect(panner);
+
+  window.audioPosition = () => {
+    console.log(`${panner.positionX.value};${panner.positionY.value};${panner.positionZ.value}`);
+  }
+
+  window.audioPositionSet = (x: number, y: number, z: number) => {
+    panner.positionX.value = x;
+    panner.positionY.value = y;
+    panner.positionZ.value = z;
+  }
+}
+
 export function init(attachRoot: HTMLElement) {
   try {
     const size = Math.min(600, window.innerWidth - 50);
@@ -305,7 +336,7 @@ export function init(attachRoot: HTMLElement) {
     const pane = initTweakpane();
     const camera = new Camera(eyeSeparation, convergence, fov, near, far);
 
-   const rotator = new TrackballRotator(canvas, null, 0);
+    const rotator = new TrackballRotator(canvas, null, 0);
     const dummyRotation = new Matrix4().identity();
 
     rotator.setCallback(() => draw(gl, program, rotator, camera, dummyRotation));
@@ -373,6 +404,8 @@ export function init(attachRoot: HTMLElement) {
         const rotationY = Math.atan2(sensor.x, sensor.z);  // Calculate rotation around Y axis
         const rotationZ = Math.atan2(sensor.y, sensor.x);  // Calculate rotation around Z axis
 
+        console.log(`${rotationY};${rotationY};${rotationZ}`)
+
         const rotationMatrix = new Matrix4()
         .rotateX(rotationX)
         .rotateY(rotationY)
@@ -386,8 +419,17 @@ export function init(attachRoot: HTMLElement) {
       console.error("Magnetometer API is not supported");
     }
     attachRoot.appendChild(canvas);
+
+
+
+    initAudio()
+      .then(console.log);
+
+
+
   } catch (e) {
     console.error(e);
     return alert(e);
   }
+
 }
