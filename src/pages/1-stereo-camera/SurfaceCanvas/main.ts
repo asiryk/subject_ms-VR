@@ -319,11 +319,7 @@ async function initAudio() {
   const volume = audioContext.createGain();
   volume.connect(panner);
 
-  window.audioPosition = () => {
-    console.log(`${panner.positionX.value};${panner.positionY.value};${panner.positionZ.value}`);
-  }
-
-  window.audioPositionSet = (x: number, y: number, z: number) => {
+  window.setAudioPosition = (x: number, y: number, z: number) => {
     panner.positionX.value = x;
     panner.positionY.value = y;
     panner.positionZ.value = z;
@@ -416,7 +412,9 @@ export function init(attachRoot: HTMLElement) {
         const rotationY = Math.atan2(sensor.x, sensor.z);  // Calculate rotation around Y axis
         const rotationZ = Math.atan2(sensor.y, sensor.x);  // Calculate rotation around Z axis
 
-        console.log(`${rotationY};${rotationY};${rotationZ}`)
+        if (window.setAudioPosition) {
+          setAudioPosition(rotationX, rotationY, rotationZ);
+        }
 
         const rotationMatrix = new Matrix4()
         .rotateX(rotationX)
@@ -435,9 +433,6 @@ export function init(attachRoot: HTMLElement) {
 
 
     initAudio()
-      .then(console.log);
-
-
 
   } catch (e) {
     console.error(e);
