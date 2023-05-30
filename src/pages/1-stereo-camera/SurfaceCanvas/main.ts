@@ -209,7 +209,10 @@ function drawLeft(
   // modify modelView matrix first
   const rotateWithSensor = rotate.multiplyRight(sensorRotation);
   const modelView2 = translate.multiplyRight(rotateWithSensor);
+  const normalMatrix2 = new Matrix4().copy(modelView2).invert().transpose();
+
   program.setUniform(Uniforms.ModelViewMatrix, modelView2);
+  program.setUniform(Uniforms.NormalMatrix, normalMatrix2);
 
   offset = surface.length;
   surface = program.vertices[1];
