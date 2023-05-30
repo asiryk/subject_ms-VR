@@ -33,6 +33,8 @@ class Camera {
   ) {}
 }
 
+const audio = {} as any;
+
 function createVertices(): { vertices: Vector3[]; uvs: Vector2[] } {
   const vertices: Vector3[] = [];
   const uvs: Vector2[] = [];
@@ -236,6 +238,8 @@ function initTweakpane() {
     cConvergence: 1,
     cFov: 15,
     cNear: 0.001,
+    soundEnabled: false,
+    filterEnabled: false,
   };
 
   pane.addInput(PARAMS, "light", {});
@@ -285,6 +289,14 @@ function initTweakpane() {
     max: 22,
   });
 
+  const fSound = pane.addFolder({
+    title: "sound settings",
+    expanded: true,
+  })
+
+  fSound.addInput(PARAMS, "soundEnabled");
+  fSound.addInput(PARAMS, "filterEnabled");
+
   return pane;
 }
 
@@ -313,11 +325,22 @@ async function initAudio() {
     await new Promise(resolve => window.setTimeout(resolve, 2000));
     audioContext.resume();
   }
+  audioContext.suspend(); // suspend to enable with tweakpane
 
-  const mainVolume = audioContext.createGain();
   const panner = audioContext.createPanner();
   const volume = audioContext.createGain();
   volume.connect(panner);
+
+  // create low-pass filter, but don't enable it
+  const lowpass = audioContext.createBiquadFilter();
+  lowpass.type = "lowpass";
+  lowpass.frequency.value = 15000; // Hz filter
+
+  audio.panner = panner;
+  audio.context = audioContext;
+  audio.filter = lowpass;
+  audio.source = source;
+  source.connect(lowpass);
 
   window.setAudioPosition = (x: number, y: number, z: number) => {
     panner.positionX.value = x;
@@ -356,6 +379,26 @@ export function init(attachRoot: HTMLElement) {
     program.setUniform(Uniforms.TextureRotAngleDeg, 0);
     draw(gl, program, rotator, camera, dummyRotation);
     pane.on("change", (e: TpChangeEvent) => {
+      if (e.presetKey == "soundEnabled") {
+        if (audio.context) {
+          if (e.value === true) {
+            audio.context.resume();
+          } else {
+            audio.context.suspend();
+          }
+        }
+      }
+
+      if (e.presetKey == "filterEnabled") {
+        if (audio.filter) {
+          if (e.value === true) {
+            audio.filter.connect(audio.context.destination);
+          } else {
+            audio.filter.disconnect();
+          }
+        }
+      }
+
       if (e.presetKey === "light") {
         const { x, y, z } = e.value;
         const position = new Vector3(x, y, z);
