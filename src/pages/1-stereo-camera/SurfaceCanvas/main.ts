@@ -72,7 +72,7 @@ function createVertices(): { vertices: Vector3[]; uvs: Vector2[] } {
 
 function createSphere(): { vertices: Vector3[]; uvs: Vector2[] } {
   const topOffset = 1.2;
-  const radius = 0.2;
+  const radius = 0.15;
   const slices = 16;
   const stacks = 16;
   const vertices = [];
