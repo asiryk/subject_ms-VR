@@ -333,7 +333,7 @@ async function initAudio() {
 
   // create low-pass filter, but don't enable it
   const lowpass = audioContext.createBiquadFilter();
-  lowpass.type = "lowpass";
+  lowpass.type = "lowshelf";
   lowpass.frequency.value = 15000; // Hz filter
 
   audio.panner = panner;
